@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BioTrack | Medical Assistant</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #7366ff;
+      --primary-light: #a5a0ff;
+      --secondary: #ff6bcb;
+      --accent: #74ebd5;
+      --dark: #1a1a2e;
+      --light: #f8f9ff;
+      --text: #2d3748;
+      --text-light: #718096;
+      --border: #e2e8f0;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+      --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+      --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+      --radius-sm: 0.5rem;
+      --radius-md: 0.75rem;
+      --radius-lg: 1rem;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    html, body {
+      height: 100%;
+      font-family: 'Poppins', sans-serif;
+      scroll-behavior: smooth;
+      background: var(--light);
+      color: var(--text);
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+    
+    /* Particle Background */
+    #particles-js {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
+    }
+    
+    /* Navbar */
+    .navbar {
+      width: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: rgba(26, 26, 46, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 5%;
+      z-index: 1000;
+      box-shadow: var(--shadow-sm);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .navbar.scrolled {
+      padding: 0.75rem 5%;
+    }
+    
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      transition: transform 0.3s ease;
+    }
+    
+    .logo:hover {
+      transform: translateY(-2px);
+    }
+    
+    .logo i {
+      color: var(--accent);
+      transition: transform 0.6s ease;
+    }
+    
+    .logo:hover i {
+      transform: rotate(15deg);
+    }
+    
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 1.5rem;
+    }
+    
+    .nav-links a {
+      text-decoration: none;
+      color: white;
+      font-weight: 500;
+      font-size: 1rem;
+      position: relative;
+      padding: 0.5rem 0;
+    }
+    
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      background: var(--accent);
+      bottom: 0;
+      left: 0;
+      transition: width 0.3s ease;
+    }
+    
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+    
+    .nav-links a:hover {
+      color: var(--accent);
+    }
+    
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      z-index: 1001;
+      width: 28px;
+      height: 24px;
+      position: relative;
+    }
+    
+    .menu-toggle .bar {
+      position: absolute;
+      width: 100%;
+      height: 3px;
+      background: white;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+    
+    .menu-toggle .bar:nth-child(1) {
+      top: 0;
+    }
+    
+    .menu-toggle .bar:nth-child(2) {
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    
+    .menu-toggle .bar:nth-child(3) {
+      bottom: 0;
+    }
+    
+    .menu-toggle.active .bar:nth-child(1) {
+      top: 50%;
+      transform: translateY(-50%) rotate(45deg);
+    }
+    
+    .menu-toggle.active .bar:nth-child(2) {
+      opacity: 0;
+    }
+    
+    .menu-toggle.active .bar:nth-child(3) {
+      bottom: 50%;
+      transform: translateY(50%) rotate(-45deg);
+    }
+    
+    /* Chat Page */
+    .chat-page {
+      min-height: 100vh;
+      padding: 6rem 5% 4rem;
+      background: var(--light);
+    }
+    
+    .chat-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 10rem);
+    }
+    
+    .chat-header {
+      background: linear-gradient(135deg, var(--primary), var(--dark));
+      color: white;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .chat-header h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .chat-header h2 i {
+      color: var(--accent);
+    }
+    
+    .back-btn {
+      background: rgba(255,255,255,0.1);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    
+    .back-btn:hover {
+      background: rgba(255,255,255,0.2);
+      transform: translateX(-2px);
+    }
+    
+    .chat-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+      background: var(--light);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .message {
+      max-width: 85%;
+      display: flex;
+      flex-direction: column;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .message.bot {
+      align-items: flex-start;
+    }
+    
+    .message.user {
+      align-items: flex-end;
+      margin-left: auto;
+    }
+    
+    .message-content {
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--radius-md);
+      position: relative;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+    
+    .bot .message-content {
+      background: white;
+      color: var(--text);
+      box-shadow: var(--shadow-sm);
+      border-bottom-left-radius: 0.25rem;
+    }
+    
+    .user .message-content {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      border-bottom-right-radius: 0.25rem;
+    }
+    
+    .message-time {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      margin-top: 0.5rem;
+      opacity: 0.8;
+    }
+    
+    .chat-input-container {
+      padding: 1rem;
+      background: white;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .chat-input-row {
+      display: flex;
+      gap: 0.75rem;
+    }
+    
+    .chat-input {
+      flex: 1;
+      display: flex;
+      background: var(--light);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    
+    .chat-input input {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border: none;
+      outline: none;
+      font-family: 'Poppins', sans-serif;
+      background: transparent;
+    }
+    
+    .chat-input button {
+      background: transparent;
+      color: var(--primary);
+      border: none;
+      width: 48px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .chat-input button:hover {
+      color: var(--secondary);
+      transform: scale(1.05);
+    }
+    
+    .image-upload-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    
+    .image-upload-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--primary);
+      color: white;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+      width: fit-content;
+    }
+    
+    .image-upload-btn:hover {
+      background: var(--primary-light);
+      transform: translateY(-1px);
+    }
+    
+    #image-upload {
+      display: none;
+    }
+    
+    #image-preview-container {
+      display: none;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+    
+    #image-preview {
+      max-width: 100%;
+      max-height: 200px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    #analyze-image-btn {
+      padding: 0.5rem 1rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+    
+    #analyze-image-btn:hover {
+      background: var(--primary-light);
+      transform: translateY(-1px);
+    }
+    
+    #analyze-image-btn i {
+      transition: transform 0.3s ease;
+    }
+    
+    #analyze-image-btn:hover i {
+      transform: scale(1.1);
+    }
+    
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: space-between;
+    }
+    
+    .language-selector {
+      flex: 1;
+      min-width: 200px;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      font-family: 'Poppins', sans-serif;
+      background: white;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+    
+    .language-selector:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px var(--primary-light);
+    }
+    
+    .speech-controls {
+      display: flex;
+      gap: 0.75rem;
+    }
+    
+    .speech-btn {
+      padding: 0.5rem 1rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+    
+    .speech-btn:hover {
+      background: var(--primary-light);
+      transform: translateY(-1px);
+    }
+    
+    .speech-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .speech-btn i {
+      font-size: 1rem;
+    }
+    
+    #listening-indicator {
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--primary);
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      background: rgba(116, 235, 213, 0.1);
+      border-radius: var(--radius-sm);
+      margin-top: 0.5rem;
+    }
+    
+    .pulse-dot {
+      width: 10px;
+      height: 10px;
+      background-color: var(--secondary);
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+    }
+    
+    .quick-replies {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+    
+    .quick-reply {
+      background: rgba(116, 235, 213, 0.15);
+      color: var(--text);
+      padding: 0.5rem 1rem;
+      border-radius: 1rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .quick-reply:hover {
+      background: var(--accent);
+      color: white;
+      transform: translateY(-1px);
+    }
+    
+    .translation-indicator {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      margin-top: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-style: italic;
+    }
+    
+    details {
+      margin-top: 0.75rem;
+      background: rgba(0,0,0,0.02);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    summary {
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-weight: 500;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+    
+    summary:hover {
+      background: rgba(0,0,0,0.03);
+    }
+    
+    details[open] summary {
+      margin-bottom: 0.5rem;
+    }
+    
+    details div {
+      padding: 0 1rem 1rem;
+      font-size: 0.9rem;
+      color: var(--text-light);
+    }
+    
+    /* Typing indicator */
+    .typing-indicator {
+      display: flex;
+      padding: 0.75rem 1rem;
+      background: white;
+      border-radius: var(--radius-md);
+      width: fit-content;
+      box-shadow: var(--shadow-sm);
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .typing-text {
+      font-size: 0.85rem;
+      color: var(--text-light);
+    }
+    
+    .typing-dots {
+      display: flex;
+      gap: 0.25rem;
+    }
+    
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--text-light);
+      border-radius: 50%;
+      animation: typingAnimation 1.4s infinite ease-in-out;
+    }
+    
+    .typing-dot:nth-child(1) {
+      animation-delay: 0s;
+    }
+    
+    .typing-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    
+    .typing-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+    
+    @keyframes typingAnimation {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-3px); }
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 0.75rem 5%;
+      }
+      
+      .menu-toggle {
+        display: flex;
+      }
+      
+      .nav-links {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 80%;
+        max-width: 300px;
+        height: 100vh;
+        background: rgba(26, 26, 46, 0.98);
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        transition: right 0.3s ease;
+        z-index: 1000;
+        gap: 2rem;
+      }
+      
+      .nav-links.active {
+        right: 0;
+      }
+      
+      .chat-page {
+        padding: 5rem 5% 3rem;
+      }
+      
+      .chat-container {
+        height: calc(100vh - 8rem);
+      }
+      
+      .message {
+        max-width: 90%;
+      }
+      
+      .controls-row {
+        flex-direction: column;
+      }
+      
+      .language-selector {
+        width: 100%;
+      }
+      
+      .speech-controls {
+        width: 100%;
+        justify-content: flex-end;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .chat-header h2 {
+        font-size: 1.1rem;
+      }
+      
+      .back-btn span {
+        display: none;
+      }
+      
+      .back-btn {
+        padding: 0.5rem;
+      }
+      
+      .chat-body {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Particle Background -->
+  <div id="particles-js"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="index.html" class="logo"><i class="fas fa-dna"></i> BioTrack</a>
+    <div class="menu-toggle" id="menu-toggle">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </div>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="index.html#about">About</a></li>
+      <li><a href="index.html#features">Features</a></li>
+      <li><a href="index.html#contact">Contact</a></li>
+      <li><a href="chat.html" class="active">Chat</a></li>
+    </ul>
+  </nav>
+
+  <!-- Chat Page Content -->
+  <main class="chat-page">
+    <div class="chat-container">
+      <div class="chat-header">
+        <h2><i class="fas fa-robot"></i> Medical Translation Assistant</h2>
+        <button class="back-btn" onclick="window.location.href='index.html'">
+          <i class="fas fa-arrow-left"></i>
+          <span>Back</span>
+        </button>
+      </div>
+      
+      <div class="chat-body" id="chat-body">
+        <div class="message bot">
+          <div class="message-content">
+            <strong>Welcome to the Medical Translation Assistant!</strong><br><br>
+            <ol style="margin: 10px 0 10px 20px;">
+              <li>Select your language below</li>
+              <li>Doctor will speak in English</li>
+              <li>I'll translate to your language</li>
+              <li>You respond in your language</li>
+              <li>I'll translate to English for the doctor</li>
+              <li>Use "Get Recommendations" for help understanding</li>
+            </ol>
+            Please select your language and begin.
+          </div>
+          <div class="message-time">Just now</div>
+        </div>
+      </div>
+      
+      <div class="chat-input-container">
+        <div class="chat-input-row">
+          <div class="chat-input">
+            <input type="text" id="user-input" placeholder="Type your message in your language..." onkeypress="handleKeyPress(event)">
+            <button id="send-btn"><i class="fas fa-paper-plane"></i></button>
+          </div>
+        </div>
+        
+        <div class="image-upload-container">
+          <label for="image-upload" class="image-upload-btn">
+            <i class="fas fa-image"></i> Attach Image
+          </label>
+          <input type="file" id="image-upload" accept="image/*">
+          
+          <div id="image-preview-container">
+            <img id="image-preview">
+            <button id="analyze-image-btn">
+              <i class="fas fa-search"></i> Analyze Image
+            </button>
+          </div>
+        </div>
+        
+        <div class="controls-row">
+          <select id="language-selector" class="language-selector">
+            <option value="en-US">Select Your Language</option>
+            <option value="es-ES">Spanish</option>
+            <option value="fr-FR">French</option>
+            <option value="de-DE">German</option>
+            <option value="it-IT">Italian</option>
+            <option value="pt-BR">Portuguese</option>
+            <option value="ru-RU">Russian</option>
+            <option value="zh-CN">Chinese</option>
+            <option value="ja-JP">Japanese</option>
+            <option value="hi-IN">Hindi</option>
+            <option value="ar-SA">Arabic</option>
+            <option value="vi-VN">Vietnamese</option>
+          </select>
+          
+          <div class="speech-controls">
+            <button id="start-speech" class="speech-btn">
+              <i class="fas fa-microphone"></i> Speak
+            </button>
+            <button id="stop-speech" class="speech-btn" disabled>
+              <i class="fas fa-stop"></i> Stop
+            </button>
+            <button id="recommend-btn" class="speech-btn">
+              <i class="fas fa-lightbulb"></i> Help
+            </button>
+          </div>
+        </div>
+        
+        <div id="listening-indicator" class="listening-indicator">
+          <div class="pulse-dot"></div>
+          <span>Listening... Speak now</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    // DOM Elements
+    const chatBody = document.getElementById('chat-body');
+    const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
+    const startSpeechBtn = document.getElementById('start-speech');
+    const stopSpeechBtn = document.getElementById('stop-speech');
+    const recommendBtn = document.getElementById('recommend-btn');
+    const languageSelector = document.getElementById('language-selector');
+    const listeningIndicator = document.getElementById('listening-indicator');
+    const imageUpload = document.getElementById('image-upload');
+    const imagePreview = document.getElementById('image-preview');
+    const imagePreviewContainer = document.getElementById('image-preview-container');
+    const analyzeImageBtn = document.getElementById('analyze-image-btn');
+    const menuToggle = document.getElementById('menu-toggle');
+    const navLinks = document.getElementById('nav-links');
+    
+    // App State
+    let conversationState = {
+      userLanguage: null,
+      conversationHistory: []
+    };
+
+    // Initialize speech recognition
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition;
+    let isListening = false;
+    
+    // Initialize the app
+    function init() {
+      setupEventListeners();
+      addMessage("Welcome! Please select your language to begin.", 'bot');
+      
+      // Set up mobile menu toggle
+      if (menuToggle && navLinks) {
+        menuToggle.addEventListener('click', () => {
+          menuToggle.classList.toggle('active');
+          navLinks.classList.toggle('active');
+        });
+      }
+    }
+    
+    // Set up all event listeners
+    function setupEventListeners() {
+      // Text input
+      sendBtn.addEventListener('click', sendMessage);
+      userInput.addEventListener('keypress', handleKeyPress);
+      
+      // Language selection
+      languageSelector.addEventListener('change', handleLanguageChange);
+      
+      // Speech controls
+      startSpeechBtn.addEventListener('click', startSpeechRecognition);
+      stopSpeechBtn.addEventListener('click', stopSpeechRecognition);
+      
+      // Recommendations
+      recommendBtn.addEventListener('click', generateRecommendations);
+      
+      // Image handling
+      imageUpload.addEventListener('change', handleImageUpload);
+      analyzeImageBtn.addEventListener('click', analyzeImage);
+    }
+    
+    // Handle key press in input field
+    function handleKeyPress(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        sendMessage();
+      }
+    }
+    
+    // Send message handler
+    function sendMessage() {
+      const text = userInput.value.trim();
+      if (text) {
+        processUserInput(text);
+      }
+    }
+    
+    // Handle language selection change
+    function handleLanguageChange() {
+      const selectedLang = languageSelector.options[languageSelector.selectedIndex].text;
+      conversationState.userLanguage = languageSelector.value;
+      
+      if (recognition) {
+        recognition.lang = languageSelector.value;
+      }
+      
+      addMessage(`Language set to ${selectedLang}`, 'bot');
+    }
+    
+    // Process user input (text messages)
+    async function processUserInput(userText) {
+      if (!userText.trim()) return;
+      
+      if (!conversationState.userLanguage) {
+        addMessage("Please select your language first", 'bot');
+        return;
+      }
+    
+      // Add user message to chat
+      addMessage(userText, 'user');
+      userInput.value = '';
+    
+      try {
+        const targetLang = languageSelector.options[languageSelector.selectedIndex].text;
+        const translatingMsg = addTypingIndicator("Translating to English...");
+        
+        const translatedText = await translateToEnglish(userText, targetLang);
+        removeTypingIndicator(translatingMsg);
+        
+        addMessage(translatedText, 'bot', true);
+        
+        // Add to conversation history
+        conversationState.conversationHistory.push({
+          speaker: 'patient',
+          original: userText,
+          english: translatedText,
+          timestamp: new Date()
+        });
+      } catch (error) {
+        addMessage(error.message, 'bot');
+      }
+    }
+    
+    // Translate text to English
+    async function translateToEnglish(text, targetLang) {
+      try {
+        const langCode = languageSelector.value.split('-')[0];
+        const langName = targetLang.toLowerCase();
+        
+        const response = await axios.post('/api/translate', {
+          text: text,
+          sourceLang: langName,
+          targetLang: 'en'
+        });
+        
+        return response.data.translation;
+      } catch (error) {
+        console.error('Translation error:', error);
+        throw new Error('Translation failed. Please try again.');
+      }
+    }
+    
+    // Translate text from English to target language
+    async function translateFromEnglish(text, targetLang) {
+      try {
+        const response = await axios.post('/api/translate', {
+          text,
+          sourceLang: 'en',
+          targetLang
+        });
+        return response.data.translation;
+      } catch (error) {
+        console.error('Translation error:', error);
+        throw new Error('Translation service unavailable');
+      }
+    }
+    
+    // Generate medical explanation
+    async function getMedicalExplanation(text, targetLang) {
+      try {
+        const response = await axios.post('/api/explain', {
+          text,
+          targetLang
+        });
+        return response.data.explanation;
+      } catch (error) {
+        console.error('Explanation error:', error);
+        throw new Error('Could not generate explanation');
+      }
+    }
+    
+    // Generate follow-up questions
+    async function getFollowUpQuestions(text, targetLang) {
+      try {
+        const response = await axios.post('/api/questions', {
+          text,
+          targetLang
+        });
+        return response.data.questions;
+      } catch (error) {
+        console.error('Questions error:', error);
+        throw new Error('Could not generate questions');
+      }
+    }
+    
+    // Generate recommendations based on conversation
+    async function generateRecommendations() {
+      const doctorMessages = conversationState.conversationHistory.filter(m => m.speaker === 'doctor');
+      if (!doctorMessages.length) {
+        addMessage("No doctor messages to analyze", 'bot');
+        return;
+      }
+    
+      const lastMsg = doctorMessages[doctorMessages.length - 1];
+      const targetLang = languageSelector.options[languageSelector.selectedIndex].text;
+      const processingMsg = addTypingIndicator("Generating recommendations...");
+    
+      try {
+        const [explanation, questions] = await Promise.all([
+          getMedicalExplanation(lastMsg.english, targetLang),
+          getFollowUpQuestions(lastMsg.english, targetLang)
+        ]);
+        
+        removeTypingIndicator(processingMsg);
+        
+        // Create recommendation message
+        const recommendationDiv = document.createElement('div');
+        recommendationDiv.className = 'message bot';
+        recommendationDiv.innerHTML = `
+          <div class="message-content">
+            <strong>Simplified Explanation:</strong><br>
+            ${explanation}
+            <div style="margin-top:0.75rem">
+              <strong>Suggested Questions:</strong>
+              <div class="quick-replies">
+                ${questions.map(q => `<div class="quick-reply">${q}</div>`).join('')}
+              </div>
+            </div>
+          </div>
+          <div class="message-time">${new Date().toLocaleTimeString()}</div>
+        `;
+        
+        // Add click handlers for quick replies
+        recommendationDiv.querySelectorAll('.quick-reply').forEach(btn => {
+          btn.addEventListener('click', () => {
+            processUserInput(btn.textContent);
+          });
+        });
+        
+        chatBody.appendChild(recommendationDiv);
+        scrollToBottom();
+      } catch (error) {
+        removeTypingIndicator(processingMsg);
+        addMessage(error.message, 'bot');
+      }
+    }
+    
+    // Handle image upload
+    function handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      // Validate file type
+      if (!file.type.match('image.*')) {
+        addMessage("Please upload a valid image file (JPEG, PNG, GIF)", 'bot');
+        return;
+      }
+      
+      // Show preview
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        imagePreview.src = e.target.result;
+        imagePreviewContainer.style.display = 'flex';
+      };
+      reader.readAsDataURL(file);
+    }
+    
+    // Analyze uploaded image
+    async function analyzeImage() {
+      const file = imageUpload.files[0];
+      if (!file) return;
+      
+      // Check file size (max 8MB)
+      if (file.size > 8 * 1024 * 1024) {
+        addMessage("Image is too large (max 8MB). Please use a smaller image.", 'bot');
+        return;
+      }
+      
+      const langOption = languageSelector.options[languageSelector.selectedIndex];
+      const targetLang = langOption.text;
+      
+      // Show loading state
+      analyzeImageBtn.disabled = true;
+      analyzeImageBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+      
+      try {
+        // First display the original image
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const imgMessage = document.createElement('div');
+          imgMessage.className = 'message user';
+          imgMessage.innerHTML = `
+            <div class="message-content">
+              <img src="${e.target.result}" alt="Uploaded medical image">
+            </div>
+            <div class="message-time">${new Date().toLocaleTimeString()}</div>
+          `;
+          chatBody.appendChild(imgMessage);
+          scrollToBottom();
+        };
+        reader.readAsDataURL(file);
+        
+        // Show analyzing message
+        const analyzingMsg = addTypingIndicator(`Analyzing your medical image and preparing explanation in ${targetLang}...`);
+        
+        // Create FormData for upload
+        const formData = new FormData();
+        formData.append('image', file);
+        formData.append('targetLang', targetLang);
+        
+        // Upload and analyze
+        const response = await axios.post('/api/analyze-image', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          },
+          timeout: 60000
+        });
+        
+        // Remove analyzing message
+        removeTypingIndicator(analyzingMsg);
+        
+        // Display the translated analysis
+        addMessage(`Here's the analysis of your image in ${targetLang}:`, 'bot');
+        addMessage(response.data.translatedAnalysis, 'bot');
+        
+        // Show technical details in collapsible section
+        const detailsHtml = `
+          <details>
+            <summary>View technical details (English)</summary>
+            <div>${response.data.originalAnalysis}</div>
+          </details>
+        `;
+        addMessage(detailsHtml, 'bot');
+        
+      } catch (error) {
+        console.error('Image analysis error:', error);
+        addMessage("Sorry, I couldn't analyze that image. Please try again.", 'bot');
+      } finally {
+        // Reset UI
+        analyzeImageBtn.disabled = false;
+        analyzeImageBtn.innerHTML = '<i class="fas fa-search"></i> Analyze Image';
+        imageUpload.value = '';
+        imagePreviewContainer.style.display = 'none';
+        scrollToBottom();
+      }
+    }
+    
+    // Speech recognition functions
+    function initSpeechRecognition() {
+      if (!SpeechRecognition) {
+        disableSpeechControls();
+        addMessage("Speech recognition not supported in your browser", 'bot');
+        return;
+      }
+      
+      recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = conversationState.userLanguage || 'en-US';
+      
+      recognition.onstart = () => {
+        isListening = true;
+        startSpeechBtn.disabled = true;
+        stopSpeechBtn.disabled = false;
+        listeningIndicator.style.display = 'flex';
+      };
+      
+      recognition.onerror = (event) => {
+        console.error('Speech error:', event.error);
+        addMessage(getSpeechError(event.error), 'bot');
+        resetSpeechRecognition();
+      };
+      
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        if (transcript) {
+          userInput.value = transcript;
+          processUserInput(transcript);
+        }
+        resetSpeechRecognition();
+      };
+      
+      recognition.onend = () => {
+        if (isListening) recognition.start();
+      };
+    }
+    
+    function startSpeechRecognition() {
+      if (!recognition) initSpeechRecognition();
+      if (!isListening && conversationState.userLanguage) {
+        recognition.lang = conversationState.userLanguage;
+        recognition.start();
+      }
+    }
+    
+    function stopSpeechRecognition() {
+      if (recognition) {
+        recognition.stop();
+      }
+      resetSpeechRecognition();
+    }
+    
+    function resetSpeechRecognition() {
+      isListening = false;
+      startSpeechBtn.disabled = false;
+      stopSpeechBtn.disabled = true;
+      listeningIndicator.style.display = 'none';
+    }
+    
+    function disableSpeechControls() {
+      startSpeechBtn.disabled = true;
+      stopSpeechBtn.disabled = true;
+    }
+    
+    function getSpeechError(errorCode) {
+      const errors = {
+        'not-allowed': 'Microphone access denied. Please allow access.',
+        'no-speech': 'No speech detected. Please try again.',
+        'audio-capture': 'No microphone found.',
+        'default': 'Speech recognition error'
+      };
+      return errors[errorCode] || errors['default'];
+    }
+    
+    // UI helper functions
+    function addMessage(text, sender, isTranslated = false) {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${sender}`;
+      messageDiv.innerHTML = `
+        <div class="message-content">${text}
+          ${isTranslated ? '<div class="translation-indicator"><i class="fas fa-language"></i> Translated</div>' : ''}
+        </div>
+        <div class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+      `;
+      chatBody.appendChild(messageDiv);
+      scrollToBottom();
+      return messageDiv;
+    }
+    
+    function addTypingIndicator(text) {
+      const typingDiv = document.createElement('div');
+      typingDiv.className = 'typing-indicator';
+      typingDiv.innerHTML = `
+        <div class="typing-text">${text}</div>
+        <div class="typing-dots">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      `;
+      chatBody.appendChild(typingDiv);
+      scrollToBottom();
+      return typingDiv;
+    }
+    
+    function removeTypingIndicator(typingElement) {
+      if (typingElement && typingElement.parentNode) {
+        chatBody.removeChild(typingElement);
+      }
+    }
+    
+    function scrollToBottom() {
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+    
+    // Start when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+</body>
+</html>
