@@ -733,6 +733,130 @@
       50% { transform: scale(1.05); opacity: 0.8; }
     }
     
+    /* Speech recognition controls */
+    .speech-controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .speech-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.9rem;
+      transition: all 0.3s;
+    }
+    
+    .speech-btn:hover {
+      background: var(--secondary);
+    }
+    
+    .speech-btn i {
+      font-size: 1rem;
+    }
+    
+    .language-selector {
+      padding: 8px 12px;
+      border-radius: 20px;
+      border: 1px solid rgba(0,0,0,0.1);
+      font-family: 'Poppins', sans-serif;
+      background: white;
+    }
+    
+    /* Listening indicator */
+    .listening-indicator {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--primary);
+      font-weight: 600;
+      margin-bottom: 10px;
+      padding: 10px 20px;
+      justify-content: center;
+    }
+    
+    .pulse-dot {
+      width: 10px;
+      height: 10px;
+      background-color: #ff4d4d;
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+    
+    /* Image upload */
+    .image-upload {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 15px;
+      padding: 15px;
+      border: 2px dashed rgba(115, 102, 255, 0.3);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .image-upload:hover {
+      border-color: var(--primary);
+      background: rgba(115, 102, 255, 0.05);
+    }
+    
+    .image-upload i {
+      font-size: 2rem;
+      color: var(--primary);
+      margin-bottom: 10px;
+    }
+    
+    .image-upload p {
+      color: var(--text-light);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+    
+    #image-preview {
+      max-width: 100%;
+      max-height: 200px;
+      margin-top: 10px;
+      display: none;
+      border-radius: 5px;
+    }
+    
+    .upload-btn {
+      margin-top: 10px;
+      padding: 8px 15px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: none;
+    }
+    
+    .upload-btn:hover {
+      background: var(--secondary);
+    }
+    
+    /* Translation indicator */
+    .translation-indicator {
+      font-size: 0.7rem;
+      color: var(--text-light);
+      margin-top: 5px;
+      font-style: italic;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
     /* Responsive Design */
     @media (max-width: 992px) {
       .hero h1 {
@@ -805,6 +929,10 @@
       .chat-body {
         height: 400px;
       }
+      
+      .speech-controls {
+        flex-wrap: wrap;
+      }
     }
     
     @media (max-width: 480px) {
@@ -828,62 +956,6 @@
         font-size: 1.2rem;
       }
     }
-    
-    /* Chat Page Specific Styles */
-    .chat-page {
-      min-height: 100vh;
-      padding: 120px 5% 80px;
-      background: var(--light);
-    }
-    
-    .chat-container {
-      max-width: 1000px;
-      margin: 0 auto;
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 15px 40px rgba(0,0,0,0.1);
-      overflow: hidden;
-    }
-    
-    .chat-header {
-      background: linear-gradient(135deg, var(--primary), var(--dark));
-      color: white;
-      padding: 20px 30px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .chat-header h2 {
-      font-size: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    
-    .chat-header h2 i {
-      color: var(--accent);
-    }
-    
-    .back-btn {
-      background: none;
-      border: none;
-      color: white;
-      font-size: 1rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    
-    .chat-body {
-      height: 500px;
-      overflow-y: auto;
-      padding: 20px;
-      background: var(--light);
-    }
-    
-    /* Rest of the chat-specific CSS from the main file */
   </style>
 </head>
 
@@ -908,199 +980,374 @@
     </ul>
   </nav>
 
-  <!-- Chat Page Content -->
-  <main class="chat-page">
-    <div class="chat-container">
-      <div class="chat-header">
-        <h2><i class="fas fa-robot medical-icon"></i> BioTrack Assistant</h2>
-        <button class="back-btn" onclick="window.location.href='index.html'">
-          <i class="fas fa-arrow-left"></i> Back
-        </button>
-      </div>
-      <div class="chat-body" id="chat-body">
-        <div class="message bot">
-          <div class="message-content">
-            Hello! I'm your BioTrack Medical Assistant. How can I help with your biotech logistics today?
-          </div>
-          <div class="message-time">Just now</div>
-          
-          <div class="quick-replies">
-            <div class="quick-reply" onclick="sendQuickReply(this)">Track a shipment</div>
-            <div class="quick-reply" onclick="sendQuickReply(this)">Temperature monitoring</div>
-            <div class="quick-reply" onclick="sendQuickReply(this)">Compliance questions</div>
-            <div class="quick-reply" onclick="sendQuickReply(this)">Emergency protocol</div>
-          </div>
+<!-- Chat Page Content -->
+<main class="chat-page">
+  <div class="chat-container">
+    <div class="chat-header">
+      <h2><i class="fas fa-robot medical-icon"></i> Medical Translation Assistant</h2>
+      <button class="back-btn" onclick="window.location.href='index.html'">
+        <i class="fas fa-arrow-left"></i> Back
+      </button>
+    </div>
+    <div class="chat-body" id="chat-body">
+      <div class="message bot">
+        <div class="message-content">
+          <strong>Welcome to the Medical Translation Assistant!</strong><br><br>
+          <ol style="margin: 10px 0 10px 20px;">
+            <li>Select your language below</li>
+            <li>Doctor will speak in English</li>
+            <li>I'll translate to your language</li>
+            <li>You respond in your language</li>
+            <li>I'll translate to English for the doctor</li>
+            <li>Use "Get Recommendations" for help understanding</li>
+          </ol>
+          Please select your language and begin.
         </div>
-      </div>
-      <div class="chat-input">
-        <input type="text" id="user-input" placeholder="Type your message..." onkeypress="handleKeyPress(event)">
-        <button id="send-btn"><i class="fas fa-paper-plane"></i></button>
+        <div class="message-time">Just now</div>
       </div>
     </div>
-  </main>
-
-  <!-- Footer -->
-  <footer>
-    <div class="footer-content">
-      <div>&copy; 2025 BioTrack. All rights reserved.</div>
-      <div class="footer-links">
-        <a href="#">Privacy Policy</a>
-        <a href="#">Terms of Service</a>
-        <a href="#">Careers</a>
-      </div>
+    <div class="chat-input">
+      <input type="text" id="user-input" placeholder="Type your message in your language..." onkeypress="handleKeyPress(event)">
+      <button id="send-btn"><i class="fas fa-paper-plane"></i></button>
     </div>
-  </footer>
+    <div class="speech-controls">
+      <select id="language-selector" class="language-selector">
+        <option value="en-US">Select Your Language</option>
+        <option value="es-ES">English</option>
+        <option value="es-ES">Spanish</option>
+        <option value="fr-FR">French</option>
+        <option value="de-DE">German</option>
+        <option value="it-IT">Italian</option>
+        <option value="pt-BR">Portuguese</option>
+        <option value="ru-RU">Russian</option>
+        <option value="zh-CN">Chinese</option>
+        <option value="ja-JP">Japanese</option>
+        <option value="hi-IN">Hindi</option>
+        <option value="ar-SA">Arabic</option>
+        <option value="vi-VN">Vietnamese</option>
+      </select>
+      <button id="start-speech" class="speech-btn"><i class="fas fa-microphone"></i> Speak</button>
+      <button id="stop-speech" class="speech-btn" disabled><i class="fas fa-stop"></i> Stop</button>
+      <button id="recommend-btn" class="speech-btn"><i class="fas fa-lightbulb"></i> Get Recommendations</button>
+    </div>
+    <div id="listening-indicator" class="listening-indicator" style="display: none;">
+      <div class="pulse-dot"></div>
+      <span>Listening... Speak now</span>
+    </div>
+  </div>
+</main>
 
-  <script>
-    // Chat functionality (same as in main file)
-    const chatBody = document.getElementById('chat-body');
-    const userInput = document.getElementById('user-input');
-    const sendBtn = document.getElementById('send-btn');
-    
-    function sendMessage() {
-      const message = userInput.value.trim();
-      if (message === '') return;
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+  // Chat functionality
+  const chatBody = document.getElementById('chat-body');
+  const userInput = document.getElementById('user-input');
+  const sendBtn = document.getElementById('send-btn');
+  const startSpeechBtn = document.getElementById('start-speech');
+  const stopSpeechBtn = document.getElementById('stop-speech');
+  const recommendBtn = document.getElementById('recommend-btn');
+  const languageSelector = document.getElementById('language-selector');
+  const listeningIndicator = document.getElementById('listening-indicator');
+  
+  // Track conversation state
+  let conversationState = {
+    userLanguage: null,
+    conversationHistory: []
+  };
+  
+  // Speech recognition setup
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition;
+  let isListening = false;
+  
+  // Initialize speech recognition if available
+  function initSpeechRecognition() {
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
       
-      addMessage(message, 'user');
-      userInput.value = '';
-      
-      showTypingIndicator();
-      
-      setTimeout(() => {
-        removeTypingIndicator();
-        const botResponse = getBotResponse(message);
-        addMessage(botResponse, 'bot');
-        chatBody.scrollTop = chatBody.scrollHeight;
-      }, 1000 + Math.random() * 2000);
-    }
-    
-    function sendQuickReply(element) {
-      const message = element.textContent;
-      addMessage(message, 'user');
-      
-      showTypingIndicator();
-      
-      setTimeout(() => {
-        removeTypingIndicator();
-        const botResponse = getBotResponse(message);
-        addMessage(botResponse, 'bot');
-        chatBody.scrollTop = chatBody.scrollHeight;
-      }, 1000 + Math.random() * 2000);
-    }
-    
-    function addMessage(text, sender) {
-      const messageDiv = document.createElement('div');
-      messageDiv.className = `message ${sender}`;
-      
-      const contentDiv = document.createElement('div');
-      contentDiv.className = 'message-content';
-      contentDiv.textContent = text;
-      
-      const timeDiv = document.createElement('div');
-      timeDiv.className = 'message-time';
-      timeDiv.textContent = getCurrentTime();
-      
-      messageDiv.appendChild(contentDiv);
-      messageDiv.appendChild(timeDiv);
-      
-      if (sender === 'bot') {
-        const quickReplies = document.createElement('div');
-        quickReplies.className = 'quick-replies';
-        
-        const replies = [
-          'How does temperature monitoring work?',
-          'What compliance standards do you meet?',
-          'How secure is my data?',
-          'Can I get a demo?'
-        ];
-        
-        replies.forEach(reply => {
-          const replyBtn = document.createElement('div');
-          replyBtn.className = 'quick-reply';
-          replyBtn.textContent = reply;
-          replyBtn.onclick = function() { sendQuickReply(this) };
-          quickReplies.appendChild(replyBtn);
-        });
-        
-        messageDiv.appendChild(quickReplies);
-      }
-      
-      chatBody.appendChild(messageDiv);
-      chatBody.scrollTop = chatBody.scrollHeight;
-    }
-    
-    function showTypingIndicator() {
-      const typingDiv = document.createElement('div');
-      typingDiv.className = 'message bot';
-      typingDiv.id = 'typing-indicator';
-      
-      const contentDiv = document.createElement('div');
-      contentDiv.className = 'typing-indicator';
-      
-      for (let i = 0; i < 3; i++) {
-        const dot = document.createElement('div');
-        dot.className = 'typing-dot';
-        contentDiv.appendChild(dot);
-      }
-      
-      typingDiv.appendChild(contentDiv);
-      chatBody.appendChild(typingDiv);
-      chatBody.scrollTop = chatBody.scrollHeight;
-    }
-    
-    function removeTypingIndicator() {
-      const typingIndicator = document.getElementById('typing-indicator');
-      if (typingIndicator) {
-        typingIndicator.remove();
-      }
-    }
-    
-    function getCurrentTime() {
-      const now = new Date();
-      return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    }
-    
-    function handleKeyPress(e) {
-      if (e.key === 'Enter') {
-        sendMessage();
-      }
-    }
-    
-    function getBotResponse(userMessage) {
-      userMessage = userMessage.toLowerCase();
-      
-      const responses = {
-        'hello': 'Hello! How can I assist you with your biotech logistics today?',
-        'hi': 'Hi there! What can I help you with?',
-        'track': 'Our real-time tracking system provides GPS location, temperature, and humidity data for all shipments. Do you have a specific shipment ID?',
-        'temperature': 'All our containers have 24/7 temperature monitoring with alerts for any deviations. We maintain strict temperature control throughout transit.',
-        'compliance': 'BioTrack meets all major compliance standards including HIPAA, GDPR, and 21 CFR Part 11. Would you like details on a specific regulation?',
-        'emergency': 'For emergency situations, please contact our 24/7 support line at +1 (800) BIO-TRACK. All shipments have contingency protocols in place.',
-        'default': 'I can help with shipment tracking, compliance questions, temperature monitoring, and emergency protocols. What would you like to know more about?'
+      recognition.onstart = function() {
+        isListening = true;
+        startSpeechBtn.disabled = true;
+        stopSpeechBtn.disabled = false;
+        listeningIndicator.style.display = 'flex';
       };
       
-      if (userMessage.includes('track') || userMessage.includes('shipment')) {
-        return responses['track'];
-      } else if (userMessage.includes('temp') || userMessage.includes('thermal')) {
-        return responses['temperature'];
-      } else if (userMessage.includes('comply') || userMessage.includes('regulation')) {
-        return responses['compliance'];
-      } else if (userMessage.includes('emergency') || userMessage.includes('urgent')) {
-        return responses['emergency'];
-      } else if (responses[userMessage]) {
-        return responses[userMessage];
-      } else {
-        return responses['default'];
+      recognition.onerror = function(event) {
+        console.error('Speech recognition error', event.error);
+        resetSpeechRecognition();
+        addMessage(getErrorMessage(event.error), 'bot');
+      };
+      
+      recognition.onend = function() {
+        listeningIndicator.style.display = 'none';
+        if (isListening) {
+          recognition.start();
+        }
+      };
+      
+      recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        if (transcript) {
+          processUserInput(transcript);
+        }
+        resetSpeechRecognition();
+      };
+    } else {
+      disableSpeechControls();
+      addMessage("Speech recognition is not supported in your browser. Please use the text input.", 'bot');
+    }
+  }
+  
+  function resetSpeechRecognition() {
+    isListening = false;
+    startSpeechBtn.disabled = false;
+    stopSpeechBtn.disabled = true;
+    listeningIndicator.style.display = 'none';
+  }
+  
+  function disableSpeechControls() {
+    startSpeechBtn.disabled = true;
+    stopSpeechBtn.disabled = true;
+  }
+  
+  function getErrorMessage(errorCode) {
+    const errors = {
+      'not-allowed': 'Microphone access was denied. Please allow microphone access.',
+      'no-speech': 'No speech detected. Please try again.',
+      'audio-capture': 'No microphone found. Please ensure a microphone is connected.',
+      'default': 'Error with speech recognition. Please try again or use text input.'
+    };
+    return errors[errorCode] || errors['default'];
+  }
+  
+  // Set user language when selected
+  languageSelector.addEventListener('change', function() {
+    if (this.value !== 'en-US') {
+      conversationState.userLanguage = this.value;
+      if (recognition) recognition.lang = this.value;
+      addMessage(`Language set to ${this.options[this.selectedIndex].text}. Doctor will speak first.`, 'bot');
+    } else if (this.value === 'en-US' && this.selectedIndex !== 0) {
+      conversationState.userLanguage = 'en-US';
+      addMessage("You've selected English. Doctor will speak first.", 'bot');
+    }
+  });
+  
+  async function processUserInput(userText) {
+    if (!conversationState.userLanguage) {
+      addMessage("Please select your language first.", 'bot');
+      return;
+    }
+    
+    addMessage(userText, 'user');
+    
+    // Show translating message
+    const translatingMsg = addMessage("Translating to English for doctor...", 'bot');
+    
+    try {
+      const translatedText = await translateText(userText, 'en');
+      
+      chatBody.removeChild(translatingMsg);
+      addMessage(translatedText, 'user', true);
+      
+      // Add to conversation history
+      conversationState.conversationHistory.push({
+        speaker: 'patient',
+        original: userText,
+        english: translatedText,
+        timestamp: new Date()
+      });
+    } catch (error) {
+      chatBody.removeChild(translatingMsg);
+      addMessage("Failed to translate your message. Please try again.", 'bot');
+    }
+  }
+
+  async function generateRecommendations() {
+    if (!conversationState.userLanguage) {
+      addMessage("Please select your language first.", 'bot');
+      return;
+    }
+    
+    const doctorMessages = conversationState.conversationHistory.filter(m => m.speaker === 'doctor');
+    if (doctorMessages.length === 0) {
+      addMessage("The doctor hasn't spoken yet. Please wait for their response.", 'bot');
+      return;
+    }
+    
+    const lastDoctorMsg = doctorMessages[doctorMessages.length - 1];
+    
+    // Show processing message
+    const processingMsg = addMessage("Analyzing the doctor's message...", 'bot');
+    
+    try {
+      const simplifiedExplanation = await generateSimplifiedExplanation(lastDoctorMsg.english, conversationState.userLanguage);
+      const questions = await generateFollowupQuestions(lastDoctorMsg.english, conversationState.userLanguage);
+      
+      chatBody.removeChild(processingMsg);
+      
+      // Create recommendation message
+      const recommendationDiv = document.createElement('div');
+      recommendationDiv.classList.add('message', 'bot');
+      recommendationDiv.innerHTML = `
+        <div class="message-content">
+          <strong>Here's what the doctor said in simpler terms:</strong><br>
+          ${simplifiedExplanation}
+          <div style="margin-top: 15px;">
+            <strong>You might want to ask:</strong>
+            <div class="quick-replies" style="margin-top: 10px;">
+              ${questions.map(q => `<div class="quick-reply" onclick="sendQuickReply(this)">${q}</div>`).join('')}
+            </div>
+          </div>
+        </div>
+        <div class="message-time">${new Date().toLocaleTimeString()}</div>
+      `;
+      
+      chatBody.appendChild(recommendationDiv);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    } catch (error) {
+      chatBody.removeChild(processingMsg);
+      addMessage("Failed to generate recommendations. Please try again.", 'bot');
+    }
+  }
+
+  async function translateText(text, targetLang) {
+    try {
+      // LibreTranslate API endpoint
+      const response = await axios.post('https://libretranslate.com/translate', {
+        q: text,
+        source: "en",
+        target: targetLang,
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      return response.data.translatedText;
+    } catch (error) {
+      console.error("Translation error:", error);
+      return `[Translation failed] ${text}`;
+    }
+  }
+
+  async function generateSimplifiedExplanation(doctorText, targetLang) {
+    // Simple explanation logic
+    const explanations = {
+      'pain scale': "The doctor wants to know how bad your pain is, from 1 (mild) to 10 (worst possible).",
+      'fever': "The doctor is asking about how long you've been sick and if you've taken any medicine.",
+      'default': "The doctor is asking for more details about your symptoms to better understand your condition."
+    };
+    
+    let explanation = explanations['default'];
+    if (doctorText.toLowerCase().includes('pain') && doctorText.toLowerCase().includes('scale')) {
+      explanation = explanations['pain scale'];
+    } else if (doctorText.toLowerCase().includes('fever')) {
+      explanation = explanations['fever'];
+    }
+    
+    try {
+      return await translateText(explanation, targetLang);
+    } catch (error) {
+      return explanation;
+    }
+  }
+
+  async function generateFollowupQuestions(doctorText, targetLang) {
+    // Simple question generation
+    const baseQuestions = [
+      "Can you explain that in simpler terms?",
+      "What could be causing this?",
+      "What treatment options are available?",
+      "How long until I feel better?",
+      "Are there any side effects to the treatment?"
+    ];
+    
+    // Translate all questions
+    const translatedQuestions = [];
+    for (const question of baseQuestions) {
+      try {
+        const translated = await translateText(question, targetLang);
+        translatedQuestions.push(translated);
+      } catch (error) {
+        translatedQuestions.push(question);
       }
     }
     
-    // Event listeners
-    sendBtn.addEventListener('click', sendMessage);
+    return translatedQuestions;
+  }
+  
+  // Add message to chat
+  function addMessage(text, sender, isTranslated = false) {
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message', sender);
     
-    // Initialize with welcome message if empty
-    if (chatBody.children.length === 0) {
-      addMessage("Welcome to BioTrack Assistant! I can help you with shipment tracking, compliance questions, and more.", 'bot');
+    let content = text;
+    if (isTranslated) {
+      content += `<div class="translation-indicator"><i class="fas fa-language"></i> Translated</div>`;
     }
-  </script>
+    
+    messageDiv.innerHTML = `
+      <div class="message-content">${content}</div>
+      <div class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+    `;
+    
+    chatBody.appendChild(messageDiv);
+    chatBody.scrollTop = chatBody.scrollHeight;
+    return messageDiv;
+  }
+  
+  // Handle quick replies
+  function sendQuickReply(element) {
+    const text = element.innerText.replace(/\[.*?\]/g, '').trim();
+    processUserInput(text);
+  }
+  
+  // Handle text input
+  function handleKeyPress(event) {
+    if (event.key === 'Enter') {
+      const text = userInput.value.trim();
+      if (text) {
+        processUserInput(text);
+        userInput.value = '';
+      }
+    }
+  }
+  
+  // Initialize the app
+  function init() {
+    initSpeechRecognition();
+    
+    // Event listeners
+    sendBtn.addEventListener('click', () => {
+      const text = userInput.value.trim();
+      if (text) {
+        processUserInput(text);
+        userInput.value = '';
+      }
+    });
+    
+    recommendBtn.addEventListener('click', generateRecommendations);
+    
+    startSpeechBtn.addEventListener('click', () => {
+      if (recognition && !isListening && conversationState.userLanguage) {
+        recognition.start();
+      } else if (!conversationState.userLanguage) {
+        addMessage("Please select your language first.", 'bot');
+      }
+    });
+    
+    stopSpeechBtn.addEventListener('click', () => {
+      if (recognition && isListening) {
+        recognition.stop();
+        resetSpeechRecognition();
+      }
+    });
+  }
+  
+  // Start the app
+  init();
+</script>
 </body>
 </html>
