@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MediSage | AI-Powered Assistant</title>
+  <title>MediSage | AI-Powered Healthcare Assistant</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -66,14 +66,16 @@
     }
     
     .logo {
-      font-size: 1.8rem;
-      font-weight: 800;
-      color: white;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-    }
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  line-height: 1.4; /* Increased from default */
+  padding: 2px 0; /* Added small padding */
+}
     
     .logo i {
       color: var(--accent);
@@ -83,6 +85,26 @@
     .logo:hover i {
       transform: rotate(360deg);
     }
+
+    .logo {
+  line-height: 1.3;
+  padding-bottom: 3px;
+}
+
+/* Fix for the title in hero section */
+.hero .title-line-2 {
+  font-size: clamp(3rem, 6vw, 4.5rem);
+  font-weight: 800;
+  margin-bottom: 20px;
+  background: linear-gradient(to right, var(--accent), white);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  line-height: 1.1; /* Adjusted from 1 */
+  display: inline-block; /* Ensures proper descender space */
+  padding-bottom: 0.1em; /* Small padding for descenders */
+}
+
     
     .nav-links {
       list-style: none;
@@ -205,29 +227,47 @@
     }
     
     .hero-content {
-      z-index: 2;
-      color: white;
-      max-width: 800px;
-      padding: 0 20px;
-      transform-style: preserve-3d;
-    }
+  z-index: 2;
+  color: white;
+  max-width: 800px;
+  padding: 0 20px;
+  transform-style: preserve-3d;
+  overflow: visible; /* <-- ADD THIS */
+}
+
     
     .hero h1 {
-      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-size: clamp(2.5rem, 5vw, 3.5rem);
       font-weight: 800;
-      margin-bottom: 20px;
+      margin-bottom: 0;
       text-shadow: 0 5px 15px rgba(0,0,0,0.1);
       background: linear-gradient(to right, white, var(--accent));
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
       line-height: 1.2;
+      animation: fadeInUp 1s ease-out forwards;
+    }
+    
+    .hero .title-line-2 {
+      font-size: clamp(3rem, 6vw, 4.5rem);
+      font-weight: 800;
+      margin-bottom: 20px;
+      background: linear-gradient(to right, var(--accent), white);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      line-height: 1;
+      animation: fadeInUp 1s ease-out 0.3s forwards;
+      opacity: 0;
     }
     
     .hero p {
       font-size: clamp(1rem, 2vw, 1.3rem);
       margin: 20px 0 40px;
       opacity: 0.9;
+      animation: fadeInUp 1s ease-out 0.6s forwards;
+      opacity: 0;
     }
     
     /* Buttons */
@@ -246,6 +286,8 @@
       box-shadow: 0 10px 20px rgba(115, 102, 255, 0.3);
       transition: all 0.4s cubic-bezier(0.65, 0, 0.35, 1);
       z-index: 1;
+      animation: fadeInUp 1s ease-out 0.9s forwards;
+      opacity: 0;
     }
     
     .btn::before {
@@ -274,6 +316,8 @@
       border: 2px solid white;
       margin-left: 15px;
       box-shadow: none;
+      animation: fadeInUp 1s ease-out 1.2s forwards;
+      opacity: 0;
     }
     
     .btn-outline:hover {
@@ -326,22 +370,24 @@
     }
     
     .stats {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 30px;
       margin-top: 60px;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
     }
     
     .stat-item {
       background: var(--light);
       padding: 30px;
       border-radius: 15px;
-      min-width: 200px;
       box-shadow: 0 5px 15px rgba(0,0,0,0.05);
       transition: transform 0.4s cubic-bezier(0.65, 0, 0.35, 1);
       position: relative;
       overflow: hidden;
+      text-align: left;
     }
     
     .stat-item::before {
@@ -368,6 +414,7 @@
     .stat-label {
       color: var(--text-light);
       font-size: 1rem;
+      line-height: 1.5;
     }
     
     /* Features Section */
@@ -390,11 +437,14 @@
     
     .card-container {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(4, 1fr);
       gap: 30px;
       margin-top: 40px;
       position: relative;
       z-index: 1;
+      max-width: 1400px;
+      margin-left: auto;
+      margin-right: auto;
     }
     
     .card {
@@ -408,6 +458,23 @@
       z-index: 1;
       transform-style: preserve-3d;
       transform: perspective(1000px);
+      opacity: 0;
+    }
+    
+    .card:nth-child(1) {
+      animation: fadeInUp 0.8s ease-out 0.2s forwards;
+    }
+    
+    .card:nth-child(2) {
+      animation: fadeInUp 0.8s ease-out 0.4s forwards;
+    }
+    
+    .card:nth-child(3) {
+      animation: fadeInUp 0.8s ease-out 0.6s forwards;
+    }
+    
+    .card:nth-child(4) {
+      animation: fadeInUp 0.8s ease-out 0.8s forwards;
     }
     
     .card::before {
@@ -733,18 +800,144 @@
       50% { transform: scale(1.05); opacity: 0.8; }
     }
     
+    /* Floating animation */
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+    
+    /* New Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes gradientFlow {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+    
+    @keyframes glow {
+      0% {
+        box-shadow: 0 0 10px rgba(116, 235, 213, 0.5);
+      }
+      50% {
+        box-shadow: 0 0 20px rgba(116, 235, 213, 0.8);
+      }
+      100% {
+        box-shadow: 0 0 10px rgba(116, 235, 213, 0.5);
+      }
+    }
+    
+    @keyframes slideInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    /* Floating Icons */
+    .floating-icons i {
+      position: absolute;
+      opacity: 0;
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    .floating-icons i:nth-child(1) {
+      top: 20%;
+      left: 10%;
+      font-size: 2rem;
+      opacity: 0.7;
+      animation-delay: 0.5s;
+      animation-name: float, fadeIn;
+      animation-duration: 6s, 1s;
+      animation-fill-mode: both;
+    }
+    
+    .floating-icons i:nth-child(2) {
+      top: 30%;
+      right: 15%;
+      font-size: 3rem;
+      opacity: 0.5;
+      animation-delay: 1s;
+      animation-name: float, fadeIn;
+      animation-duration: 7s, 1s;
+      animation-fill-mode: both;
+    }
+    
+    .floating-icons i:nth-child(3) {
+      bottom: 25%;
+      left: 15%;
+      font-size: 2.5rem;
+      opacity: 0.6;
+      animation-delay: 1.5s;
+      animation-name: float, fadeIn;
+      animation-duration: 5s, 1s;
+      animation-fill-mode: both;
+    }
+    
+    .floating-icons i:nth-child(4) {
+      bottom: 15%;
+      right: 20%;
+      font-size: 2.8rem;
+      opacity: 0.4;
+      animation-delay: 2s;
+      animation-name: float, fadeIn;
+      animation-duration: 8s, 1s;
+      animation-fill-mode: both;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
     /* Responsive Design */
+    @media (max-width: 1200px) {
+      .card-container {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
     @media (max-width: 992px) {
       .hero h1 {
-        font-size: 3rem;
+        font-size: 2.5rem;
+      }
+      
+      .hero .title-line-2 {
+        font-size: 3.5rem;
       }
       
       section {
         padding: 100px 5%;
-      }
-      
-      .card-container {
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       }
     }
     
@@ -778,6 +971,10 @@
       }
       
       .hero h1 {
+        font-size: 2rem;
+      }
+      
+      .hero .title-line-2 {
         font-size: 2.5rem;
       }
       
@@ -795,11 +992,12 @@
       }
       
       .stats {
+        grid-template-columns: 1fr;
         gap: 15px;
       }
       
-      .stat-item {
-        min-width: 150px;
+      .card-container {
+        grid-template-columns: 1fr;
       }
       
       .chat-body {
@@ -809,15 +1007,15 @@
     
     @media (max-width: 480px) {
       .hero h1 {
-        font-size: 2rem;
+        font-size: 1.8rem;
+      }
+      
+      .hero .title-line-2 {
+        font-size: 2.2rem;
       }
       
       section h2 {
         font-size: 1.8rem;
-      }
-      
-      .stat-item {
-        width: 100%;
       }
       
       .footer-content {
@@ -837,7 +1035,7 @@
 
   <!-- Navbar -->
   <nav class="navbar">
-    <a href="index.html" class="logo"><i class="fas fa-dna"></i> MediSage</a>
+    <a href="index.html" class="logo"><i class="fas fa-comment-medical"></i> MediSage</a>
     <div class="menu-toggle" id="menu-toggle">
       <span class="bar"></span>
       <span class="bar"></span>
@@ -852,95 +1050,96 @@
     </ul>
   </nav>
 
-  <!-- Main Content -->
-  <div class="main-content">
-    <!-- Home Page -->
-    <div id="home-page" class="tab-content active">
-      <!-- Hero Section -->
-      <section id="hero" class="hero">
-        <div class="hero-content">
-          <h1>Welcome to the New age MediSage</h1>
-          <p>AI-powered tracking for the most sensitive biological materials. Real-time monitoring, unparalleled security, and peace of mind.</p>
-          <div class="btn-container" style="display: flex; justify-content: center; gap: 15px;">
-            <a href="#about" class="btn btn-ripple">Explore More</a>
-            <a href="chat.html" class="btn btn-outline btn-ripple">Get Started</a>
-          </div>
+<!-- Main Content -->
+<div class="main-content">
+  <!-- Home Page -->
+  <div id="home-page" class="tab-content active">
+    <!-- Hero Section -->
+    <section id="hero" class="hero">
+      <div class="hero-content">
+        <h1>Welcome to the New Age</h1>
+        <div class="title-line-2">MediSage</div>
+        <p>Bridging healthcare gaps for immigrants with AI-powered language support, medical guidance, and seamless doctor communication.</p>
+        <div class="btn-container" style="display: flex; justify-content: center; gap: 15px;">
+          <a href="#about" class="btn btn-ripple">Learn More</a>
+          <a href="chat.html" class="btn btn-outline btn-ripple">Try Now</a>
         </div>
+      </div>
         
         <!-- Floating Icons -->
         <div class="floating-icons">
-          <i class="fas fa-microscope" style="position: absolute; top: 20%; left: 10%; font-size: 2rem; opacity: 0.7; animation: float 6s ease-in-out infinite 0.5s;"></i>
-          <i class="fas fa-dna" style="position: absolute; top: 30%; right: 15%; font-size: 3rem; opacity: 0.5; animation: float 7s ease-in-out infinite 1s;"></i>
-          <i class="fas fa-vial" style="position: absolute; bottom: 25%; left: 15%; font-size: 2.5rem; opacity: 0.6; animation: float 5s ease-in-out infinite 1.5s;"></i>
-          <i class="fas fa-atom" style="position: absolute; bottom: 15%; right: 20%; font-size: 2.8rem; opacity: 0.4; animation: float 8s ease-in-out infinite 2s;"></i>
+          <i class="fas fa-heartbeat"></i>
+          <i class="fas fa-language"></i>
+          <i class="fas fa-stethoscope"></i>
+          <i class="fas fa-user-md"></i>
         </div>
       </section>
 
       <!-- About Section -->
       <section id="about" class="about">
-        <h2>About MediSage</h2>
-        <p class="about-text">MediSage is revolutionizing biotech logistics with cutting-edge technology that ensures the safe, secure, and traceable transportation of sensitive biological materials. Our platform combines AI, blockchain, and IoT to deliver unprecedented visibility and control.</p>
+        <h2>The Challenge We Address</h2>
+        <p class="about-text">Immigrants face significant barriers in accessing quality healthcare. At MediSage, we are the children of first-generation immigrant families, driven by our frustration with a healthcare system that too often leaves non-native English speakers behind. We created MediSage to simplify healthcare — an all-in-one medical assistant designed to make navigation and communication accessible, clear, and empowering for all walks of life.</p>
         
         <div class="stats">
           <div class="stat-item">
-            <div class="stat-number" data-count="99.9">0</div>
-            <div class="stat-label">Success Rate</div>
+            <div class="stat-number" data-count="47">0</div>
+            <div class="stat-label">of immigrants experience difficulty navigating the healthcare system due to language and cultural barriers</div>
           </div>
           <div class="stat-item">
-            <div class="stat-number" data-count="24">0</div>
-            <div class="stat-label">/7 Monitoring</div>
+            <div class="stat-number" data-count="56">0</div>
+            <div class="stat-label">of immigrants are less likely to have a regular source of care compared to native-born citizens</div>
           </div>
           <div class="stat-item">
-            <div class="stat-number" data-count="500">0</div>
-            <div class="stat-label">Clients</div>
+            <div class="stat-number" data-count="65">0</div>
+            <div class="stat-label">of immigrants report limited English proficiency resulting in difficulty understanding medical instructions</div>
           </div>
           <div class="stat-item">
-            <div class="stat-number" data-count="10">0</div>
-            <div class="stat-label">Countries</div>
+            <div class="stat-number" data-count="2">0x</div>
+            <div class="stat-label">more unlikely for immigrants to seek medical help compared to US-born citizens due to accessibility challenges</div>
           </div>
         </div>
       </section>
 
       <!-- Features Section -->
       <section id="features" class="features">
-        <h2>Key Features</h2>
+        <h2>How MediSage Helps</h2>
         <div class="card-container">
           <div class="card">
             <div class="card-icon">
-              <i class="fas fa-map-marked-alt"></i>
+              <i class="fas fa-comments"></i>
             </div>
-            <h3>Real-Time Monitoring</h3>
-            <p>GPS-enabled tracking and condition monitoring (temperature, humidity, shock detection) with live alerts for any deviations.</p>
+            <h3>Patient-Doctor Communication</h3>
+            <p>Real-time translation and cultural context to ensure clear understanding between patients and healthcare providers during consultations.</p>
           </div>
           <div class="card">
             <div class="card-icon">
-              <i class="fas fa-lock"></i>
+              <i class="fas fa-file-prescription"></i>
             </div>
-            <h3>Data Integrity</h3>
-            <p>Blockchain-secured logs to ensure tamper-proof tracking records with full audit capabilities.</p>
+            <h3>Medical Interpretation</h3>
+            <p>Instant translation of prescriptions, medical documents, and instructions into the patient's preferred language with cultural adaptations.</p>
           </div>
           <div class="card">
             <div class="card-icon">
-              <i class="fas fa-brain"></i>
+              <i class="fas fa-robot"></i>
             </div>
-            <h3>AI Optimization</h3>
-            <p>Smart route planning using machine learning to reduce transit time and risks based on historical data.</p>
+            <h3>AI Medical Assistant</h3>
+            <p>24/7 AI-powered guidance that understands medical concerns in multiple languages and provides culturally-sensitive health information.</p>
           </div>
           <div class="card">
             <div class="card-icon">
-              <i class="fas fa-shield-alt"></i>
+              <i class="fas fa-sync-alt"></i>
             </div>
-            <h3>Compliance & Security</h3>
-            <p>Designed to meet strict healthcare and biotech logistics regulations globally with automated reporting.</p>
+            <h3>Record Synchronization</h3>
+            <p>Secure, instant sharing of medical records between providers with automatic translation while maintaining accuracy of medical terminology.</p>
           </div>
         </div>
       </section>
 
       <!-- Contact Section -->
       <section id="contact" class="contact">
-        <h2>Let's Connect</h2>
-        <p>Ready to optimize your biotech logistics? <br> Reach out to us today for a personalized demo.</p>
-        <a href="mailto:contact@biotrack.com" class="btn btn-ripple pulse">Contact Us</a>
+        <h2>Join Our Mission</h2>
+        <p>Help us bridge the healthcare gap for immigrant communities. <br> Partner with us or learn how MediSage can help your organization.</p>
+        <a href="mailto:contact@medisage.com" class="btn btn-ripple pulse">Get In Touch</a>
       </section>
     </div>
   </div>
@@ -948,7 +1147,7 @@
   <!-- Footer -->
   <footer>
     <div class="footer-content">
-      <div>&copy; 2025 BioTrack. All rights reserved.</div>
+      <div>&copy; 2025 MediSage. All rights reserved.</div>
       <div class="footer-links">
         <a href="#">Privacy Policy</a>
         <a href="#">Terms of Service</a>
@@ -957,43 +1156,50 @@
     </div>
   </footer>
 
-  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
   <script>
-    // Initialize particles.js
     document.addEventListener('DOMContentLoaded', function() {
       if (document.getElementById('particles-js')) {
         particlesJS("particles-js", {
           "particles": {
             "number": {
-              "value": 60,
+              "value": 150,
               "density": {
                 "enable": true,
-                "value_area": 800
+                "value_area": 1000
               }
             },
             "color": {
-              "value": "#ffffff"
+              "value": ["#2FA9EB", "#85BE47", "#FFFFFF", "#FF6BCB"]
             },
             "shape": {
-              "type": "circle",
+              "type": ["circle", "triangle", "polygon"],
               "stroke": {
                 "width": 0,
                 "color": "#000000"
+              },
+              "polygon": {
+                "nb_sides": 6
               }
             },
             "opacity": {
-              "value": 0.5,
-              "random": false,
+              "value": 0.8,
+              "random": true,
               "anim": {
-                "enable": false
+                "enable": true,
+                "speed": 1,
+                "opacity_min": 0.1,
+                "sync": false
               }
             },
             "size": {
-              "value": 3,
+              "value": 5,
               "random": true,
               "anim": {
-                "enable": false
+                "enable": true,
+                "speed": 4,
+                "size_min": 0.3,
+                "sync": false
               }
             },
             "line_linked": {
@@ -1001,18 +1207,20 @@
               "distance": 150,
               "color": "#ffffff",
               "opacity": 0.4,
-              "width": 1
+              "width": 1.5
             },
             "move": {
               "enable": true,
-              "speed": 1.5,
+              "speed": 3,
               "direction": "none",
-              "random": false,
+              "random": true,
               "straight": false,
               "out_mode": "out",
               "bounce": false,
               "attract": {
-                "enable": false
+                "enable": true,
+                "rotateX": 800,
+                "rotateY": 1600
               }
             }
           },
@@ -1021,23 +1229,37 @@
             "events": {
               "onhover": {
                 "enable": true,
-                "mode": "grab"
+                "mode": "bubble"
               },
               "onclick": {
                 "enable": true,
-                "mode": "push"
+                "mode": "repulse"
               },
               "resize": true
             },
             "modes": {
               "grab": {
-                "distance": 140,
+                "distance": 200,
                 "line_linked": {
                   "opacity": 1
                 }
               },
+              "bubble": {
+                "distance": 200,
+                "size": 10,
+                "duration": 2,
+                "opacity": 0.8,
+                "speed": 3
+              },
+              "repulse": {
+                "distance": 100,
+                "duration": 0.4
+              },
               "push": {
-                "particles_nb": 3
+                "particles_nb": 4
+              },
+              "remove": {
+                "particles_nb": 2
               }
             }
           },
@@ -1084,9 +1306,10 @@
             if (entry.isIntersecting) {
               const stat = entry.target;
               const target = parseInt(stat.getAttribute('data-count'));
-              const suffix = stat.textContent.includes('%') ? '%' : '';
+              const suffix = stat.textContent.includes('x') ? 'x' : '';
               let count = 0;
               const duration = 1500;
+             
               const increment = target / (duration / 16);
 
               const updateCount = () => {
