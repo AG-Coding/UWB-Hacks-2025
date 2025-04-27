@@ -259,3 +259,56 @@ app.get('/chat', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
+
+// Add this new endpoint to your server code
+app.post('/api/generate-recommendations', async (req, res) => {
+  try {
+    const { doctorMessage, targetLanguage } = req.body;
+
+    // First generate the simplified explanation
+    const explanationPrompt = `Explain this doctor's message in simple ${targetLanguage} that a patient can understand (2-3 sentences max):\n\n"${doctorMessage}"`;
+    
+    const explanationResponse = await callChatGPT([
+      {
+        role: "system",
+        content: "You are a medical assistant that explains complex medical information in simple terms for patients."
+      },
+      {
+        role: "user",
+        content: explanationPrompt
+      }
+    ]);
+
+    // Then generate follow-up questions
+    const questionsPrompt = `Generate 4 follow-up questions in ${targetLanguage} that a patient might ask about this medical information (format as a bullet list):\n\n"${doctorMessage}"`;
+    
+    const questionsResponse = await callChatGPT([
+      {
+        role: "system",
+        content: "Generate relevant, helpful follow-up questions a patient might ask their doctor."
+      },
+      {
+        role: "user",
+        content: questionsPrompt
+      }
+    ]);
+
+    // Process the questions response into an array
+    const questions = questionsResponse.split('\n')
+      .filter(q => q.trim().length > 0)
+      .map(q => q.replace(/^[•\-\*]\s*/, '').trim())
+      .filter(q => q.length > 0);
+
+    res.json({
+      simplifiedExplanation: explanationResponse,
+      followUpQuestions: questions.slice(0, 4) // Ensure max 4 questions
+    });
+
+  } catch (error) {
+    console.error('Recommendation generation error:', error);
+    res.status(500).json({ 
+      error: 'Failed to generate recommendations',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});

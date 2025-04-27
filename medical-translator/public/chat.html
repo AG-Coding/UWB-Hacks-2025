@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BioTrack | Medical Assistant</title>
+  <title>MediSage | Medical Assistant</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -899,6 +899,90 @@
     .pulse {
       animation: pulse 2s infinite;
     }
+
+    .speaker-label {
+      font-size: 0.7rem;
+      color: #666;
+      margin-top: 0.25rem;
+      font-style: italic;
+    }
+
+    /* Add to your existing styles */
+    .recommendation-container {
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 10px;
+      border-left: 4px solid #4a90e2;
+    }
+    .recommendation-title {
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #2c3e50;
+    }
+    .recommendation-item {
+      margin-bottom: 6px;
+    }
+    .quick-reply {
+      display: inline-block;
+      background-color: #e3f2fd;
+      padding: 6px 12px;
+      margin: 4px;
+      border-radius: 16px;
+      cursor: pointer;
+      font-size: 0.9em;
+      transition: background-color 0.2s;
+    }
+    .quick-reply:hover {
+      background-color: #bbdefb;
+    }
+
+    /* Add to your existing styles */
+    .recommendation-container {
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 10px;
+      border-left: 4px solid #4a90e2;
+    }
+    .recommendation-title {
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #2c3e50;
+    }
+    .recommendation-item {
+      margin-bottom: 6px;
+    }
+    .quick-reply {
+      display: inline-block;
+      background-color: #e3f2fd;
+      padding: 6px 12px;
+      margin: 4px;
+      border-radius: 16px;
+      cursor: pointer;
+      font-size: 0.9em;
+      transition: background-color 0.2s;
+    }
+    .quick-reply:hover {
+      background-color: #bbdefb;
+    }
+    .recommend-btn {
+      background-color: #4a90e2;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9em;
+      margin-left: 8px;
+      transition: background-color 0.2s;
+    }
+    .recommend-btn:hover {
+      background-color: #357abd;
+    }
+    .recommend-btn i {
+      margin-right: 5px;
+    } 
   </style>
 </head>
 
@@ -908,7 +992,7 @@
 
   <!-- Navbar -->
   <nav class="navbar">
-    <a href="index.html" class="logo"><i class="fas fa-dna"></i> BioTrack</a>
+    <a href="index.html" class="logo"><i class="fas fa-dna"></i> MediSage</a>
     <div class="menu-toggle" id="menu-toggle">
       <span class="bar"></span>
       <span class="bar"></span>
@@ -998,7 +1082,7 @@
               <i class="fas fa-stop"></i> Stop
             </button>
             <button id="recommend-btn" class="speech-btn">
-              <i class="fas fa-lightbulb"></i> Help
+              <i class="fas fa-lightbulb"></i> Get Help
             </button>
           </div>
         </div>
@@ -1032,7 +1116,8 @@
     // App State
     let conversationState = {
       userLanguage: null,
-      conversationHistory: []
+      conversationHistory: [],
+      waitingForDoctor: true // Flag to track if we're waiting for doctor's input
     };
 
     // Initialize speech recognition
@@ -1044,6 +1129,7 @@
     function init() {
       setupEventListeners();
       addMessage("Welcome! Please select your language to begin.", 'bot');
+      document.getElementById('recommend-btn').addEventListener('click', generateRecommendations);
       
       // Set up mobile menu toggle
       if (menuToggle && navLinks) {
@@ -1101,18 +1187,62 @@
       }
       
       addMessage(`Language set to ${selectedLang}`, 'bot');
+      conversationState.waitingForDoctor = true; // Now waiting for doctor's first message
     }
     
-    // Process user input (text messages)
-    async function processUserInput(userText) {
-      if (!userText.trim()) return;
+    // Process doctor's input (in English)
+    async function processDoctorInput(doctorText) {
+      if (!doctorText.trim()) return;
       
       if (!conversationState.userLanguage) {
         addMessage("Please select your language first", 'bot');
         return;
       }
     
-      // Add user message to chat
+      // Add original doctor message to chat (in English)
+      addMessage(doctorText, 'bot');
+    
+      try {
+        const targetLang = languageSelector.options[languageSelector.selectedIndex].text;
+        const translatingMsg = addTypingIndicator(`Translating to ${targetLang}...`);
+        
+        // Translate to patient's language
+        const translatedText = await translateFromEnglish(doctorText, conversationState.userLanguage);
+        removeTypingIndicator(translatingMsg);
+        
+        // Show translated message to patient
+        addMessage(translatedText, 'bot', true);
+        
+        // Add to conversation history
+        conversationState.conversationHistory.push({
+          speaker: 'doctor',
+          original: doctorText,
+          translation: translatedText,
+          timestamp: new Date()
+        });
+        
+        // Now ready for patient's response
+        conversationState.waitingForDoctor = false;
+      } catch (error) {
+        addMessage(error.message, 'bot');
+      }
+    }
+    
+    // Process user input (patient's response in their language)
+    async function processUserInput(userText) {
+      if (!userText.trim()) return;
+      
+      if (conversationState.waitingForDoctor) {
+        addMessage("Please wait for the doctor's message first", 'bot');
+        return;
+      }
+      
+      if (!conversationState.userLanguage) {
+        addMessage("Please select your language first", 'bot');
+        return;
+      }
+    
+      // Add user message to chat (in their language)
       addMessage(userText, 'user');
       userInput.value = '';
     
@@ -1120,9 +1250,11 @@
         const targetLang = languageSelector.options[languageSelector.selectedIndex].text;
         const translatingMsg = addTypingIndicator("Translating to English...");
         
+        // Translate to English for the doctor
         const translatedText = await translateToEnglish(userText, targetLang);
         removeTypingIndicator(translatingMsg);
         
+        // Show translated message (for doctor)
         addMessage(translatedText, 'bot', true);
         
         // Add to conversation history
@@ -1132,6 +1264,9 @@
           english: translatedText,
           timestamp: new Date()
         });
+        
+        // Now waiting for doctor's next message
+        conversationState.waitingForDoctor = true;
       } catch (error) {
         addMessage(error.message, 'bot');
       }
@@ -1199,58 +1334,62 @@
       }
     }
     
-    // Generate recommendations based on conversation
     async function generateRecommendations() {
-      const doctorMessages = conversationState.conversationHistory.filter(m => m.speaker === 'doctor');
-      if (!doctorMessages.length) {
-        addMessage("No doctor messages to analyze", 'bot');
-        return;
-      }
-    
-      const lastMsg = doctorMessages[doctorMessages.length - 1];
-      const targetLang = languageSelector.options[languageSelector.selectedIndex].text;
-      const processingMsg = addTypingIndicator("Generating recommendations...");
-    
-      try {
-        const [explanation, questions] = await Promise.all([
-          getMedicalExplanation(lastMsg.english, targetLang),
-          getFollowUpQuestions(lastMsg.english, targetLang)
-        ]);
-        
-        removeTypingIndicator(processingMsg);
-        
-        // Create recommendation message
-        const recommendationDiv = document.createElement('div');
-        recommendationDiv.className = 'message bot';
-        recommendationDiv.innerHTML = `
-          <div class="message-content">
-            <strong>Simplified Explanation:</strong><br>
-            ${explanation}
-            <div style="margin-top:0.75rem">
-              <strong>Suggested Questions:</strong>
-              <div class="quick-replies">
-                ${questions.map(q => `<div class="quick-reply">${q}</div>`).join('')}
-              </div>
-            </div>
+  const doctorMessages = conversationState.conversationHistory.filter(m => m.speaker === 'doctor');
+  if (!doctorMessages.length) {
+    addMessage("No doctor messages to analyze yet. Please wait for the doctor to speak first.", 'bot');
+    return;
+  }
+
+  const lastMsg = doctorMessages[doctorMessages.length - 1];
+  const targetLang = languageSelector.options[languageSelector.selectedIndex].text;
+  const processingMsg = addTypingIndicator("Analyzing doctor's message and preparing recommendations...");
+
+  try {
+    const response = await axios.post('/api/generate-recommendations', {
+      doctorMessage: lastMsg.original,
+      targetLanguage: targetLang
+    });
+
+    removeTypingIndicator(processingMsg);
+
+    // Create recommendation message
+    const recommendationDiv = document.createElement('div');
+    recommendationDiv.className = 'message bot';
+    recommendationDiv.innerHTML = `
+      <div class="message-content">
+        <div class="recommendation-container">
+          <div class="recommendation-title">Simplified Explanation:</div>
+          <div class="recommendation-item">${response.data.simplifiedExplanation}</div>
+          
+          <div class="recommendation-title" style="margin-top: 12px;">Suggested Follow-up Questions:</div>
+          <div class="quick-replies">
+            ${response.data.followUpQuestions.map(q => 
+              `<div class="quick-reply" data-question="${q}">${q}</div>`
+            ).join('')}
           </div>
-          <div class="message-time">${new Date().toLocaleTimeString()}</div>
-        `;
-        
-        // Add click handlers for quick replies
-        recommendationDiv.querySelectorAll('.quick-reply').forEach(btn => {
-          btn.addEventListener('click', () => {
-            processUserInput(btn.textContent);
-          });
-        });
-        
-        chatBody.appendChild(recommendationDiv);
-        scrollToBottom();
-      } catch (error) {
-        removeTypingIndicator(processingMsg);
-        addMessage(error.message, 'bot');
-      }
-    }
-    
+        </div>
+      </div>
+      <div class="message-time">${new Date().toLocaleTimeString()}</div>
+    `;
+
+    // Add click handlers for quick replies
+    recommendationDiv.querySelectorAll('.quick-reply').forEach(btn => {
+      btn.addEventListener('click', () => {
+        userInput.value = btn.getAttribute('data-question');
+        userInput.focus();
+      });
+    });
+
+    chatBody.appendChild(recommendationDiv);
+    scrollToBottom();
+  } catch (error) {
+    removeTypingIndicator(processingMsg);
+    console.error('Recommendation error:', error);
+    addMessage("Sorry, I couldn't generate recommendations. Please try again later.", 'bot');
+  }
+}
+
     // Handle image upload
     function handleImageUpload(event) {
       const file = event.target.files[0];
@@ -1381,7 +1520,11 @@
         const transcript = event.results[0][0].transcript;
         if (transcript) {
           userInput.value = transcript;
-          processUserInput(transcript);
+          if (conversationState.waitingForDoctor) {
+            processDoctorInput(transcript);
+          } else {
+            processUserInput(transcript);
+          }
         }
         resetSpeechRecognition();
       };
@@ -1429,12 +1572,36 @@
     }
     
     // UI helper functions
+    // function addMessage(text, sender, isTranslated = false) {
+    //   const messageDiv = document.createElement('div');
+    //   messageDiv.className = `message ${sender}`;
+    //   messageDiv.innerHTML = `
+    //     <div class="message-content">${text}
+    //       ${isTranslated ? '<div class="translation-indicator"><i class="fas fa-language"></i> Translated</div>' : ''}
+    //     </div>
+    //     <div class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+    //   `;
+    //   chatBody.appendChild(messageDiv);
+    //   scrollToBottom();
+    //   return messageDiv;
+    // }
+
     function addMessage(text, sender, isTranslated = false) {
       const messageDiv = document.createElement('div');
       messageDiv.className = `message ${sender}`;
+      
+      // Determine speaker label based on sender and conversation state
+      let speakerLabel = '';
+      if (sender === 'bot') {
+        speakerLabel = conversationState.waitingForDoctor ? 'Doctor' : 'Translation';
+      } else {
+        speakerLabel = 'Patient';
+      }
+      
       messageDiv.innerHTML = `
         <div class="message-content">${text}
           ${isTranslated ? '<div class="translation-indicator"><i class="fas fa-language"></i> Translated</div>' : ''}
+          <div class="speaker-label">${speakerLabel}</div>
         </div>
         <div class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
       `;
