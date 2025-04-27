@@ -1120,17 +1120,37 @@
   currentSpeaker: 'doctor' // Start with doctor speaking first
 };
 
-    // Initialize speech recognition
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    let recognition;
-    let isListening = false;
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition;
+let isListening = false;
+let finalTranscript = '';
+let ignoreOnEnd = false;
+
+// Language configuration
+const languageSettings = {
+  'es-ES': { timeout: 25000, continuous: true }, // Spanish
+  'fr-FR': { timeout: 25000, continuous: true }, // French
+  'de-DE': { timeout: 25000, continuous: true }, // German
+  'it-IT': { timeout: 25000, continuous: true }, // Italian
+  'pt-BR': { timeout: 25000, continuous: true }, // Portuguese
+  'ru-RU': { timeout: 30000, continuous: true }, // Russian
+  'zh-CN': { timeout: 30000, continuous: true }, // Chinese
+  'ja-JP': { timeout: 30000, continuous: true }, // Japanese
+  'hi-IN': { timeout: 30000, continuous: true }, // Hindi
+  'ar-SA': { timeout: 30000, continuous: true }, // Arabic
+  'vi-VN': { timeout: 30000, continuous: true }, // Vietnamese
+  'en-US': { timeout: 20000, continuous: false }  // English
+};
     
     // Initialize the app
     function init() {
+      setupSpeechRecognition(); // Add this line
       setupEventListeners();
+      updateInputPlaceholder(); // Add this line
       addMessage("Welcome! Please select your language to begin.", 'bot');
       updateInputPlaceholder(); 
       document.getElementById('recommend-btn').addEventListener('click', generateRecommendations);
+
       
       // Set up mobile menu toggle
       if (menuToggle && navLinks) {
@@ -1140,6 +1160,282 @@
         });
       }
     }
+
+    // Update recognition language based on current speaker and selected language
+    function updateRecognitionSettings() {
+  if (!recognition) return;
+  
+  const langCode = getCurrentLanguageCode();
+  const settings = languageSettings[langCode] || languageSettings['en-US'];
+  
+  recognition.lang = langCode;
+  recognition.continuous = settings.continuous;
+  
+  console.log(`Speech config updated: ${langCode}, continuous=${settings.continuous}`);
+}
+
+
+// Start speech recognition with language check
+function startSpeechRecognition() {
+  if (!recognition) setupSpeechRecognition();
+  
+  // Ensure we have a valid language for patient speech
+  if (conversationState.currentSpeaker === 'patient' && !conversationState.userLanguage) {
+    addMessage("Please select your language first before speaking", 'bot');
+    return;
+  }
+  
+  // Update language before starting
+  updateRecognitionLanguage();
+  
+  if (!isListening) {
+    try {
+      recognition.start();
+    } catch (error) {
+      console.error('Recognition start error:', error);
+      addMessage("Couldn't start speech recognition. Please try again.", 'bot');
+      resetSpeechRecognition();
+    }
+  }
+}
+
+function processTranscript(transcript) {
+  if (transcript.trim().length > 0) {
+    userInput.value = transcript;
+    if (conversationState.currentSpeaker === 'doctor') {
+      processDoctorInput(transcript);
+    } else {
+      processUserInput(transcript);
+    }
+  }
+  resetSpeechRecognition();
+}
+
+async function handleFinalTranscript(transcript) {
+  if (transcript.trim().length === 0) return;
+  
+  // Show original speech in chat first
+  addMessage(transcript, conversationState.currentSpeaker === 'doctor' ? 'bot' : 'user');
+  
+  // Then process based on who is speaking
+  if (conversationState.currentSpeaker === 'doctor') {
+    // Doctor speaking (English) - translate to patient's language
+    await processDoctorInput(transcript);
+  } else {
+    // Patient speaking (foreign language) - translate to English
+    await processPatientSpeech(transcript);
+  }
+  
+  // Clear the final transcript for next use
+  finalTranscript = '';
+}
+
+function getCurrentLanguageCode() {
+  return conversationState.currentSpeaker === 'doctor' 
+    ? 'en-US' 
+    : (conversationState.userLanguage || 'en-US');
+}
+
+// Helper function to get language name
+function getLanguageName(langCode) {
+  const langMap = {
+    'es-ES': 'Spanish',
+    'fr-FR': 'French',
+    'de-DE': 'German',
+    'it-IT': 'Italian',
+    'pt-BR': 'Portuguese',
+    'ru-RU': 'Russian',
+    'zh-CN': 'Chinese',
+    'ja-JP': 'Japanese',
+    'hi-IN': 'Hindi',
+    'ar-SA': 'Arabic',
+    'vi-VN': 'Vietnamese'
+  };
+  return langMap[langCode] || 'this language';
+}
+
+
+   // Set up speech recognition with improved multi-language support
+   function setupSpeechRecognition() {
+  if (!SpeechRecognition) {
+    disableSpeechControls();
+    addMessage("Speech recognition not supported in your browser", 'bot');
+    return;
+  }
+
+  recognition = new SpeechRecognition();
+  finalTranscript = '';
+  
+  updateRecognitionSettings();
+
+  recognition.interimResults = true;
+  recognition.maxAlternatives = 3;
+
+  recognition.onstart = () => {
+    isListening = true;
+    startSpeechBtn.disabled = true;
+    stopSpeechBtn.disabled = false;
+    listeningIndicator.style.display = 'flex';
+    finalTranscript = '';
+    
+    const langCode = getCurrentLanguageCode();
+    const settings = languageSettings[langCode] || languageSettings['en-US'];
+    
+    clearTimeout(speechTimeout);
+    speechTimeout = setTimeout(() => {
+      if (isListening) {
+        ignoreOnEnd = true;
+        stopSpeechRecognition();
+        if (finalTranscript.length > 0) {
+          handleFinalTranscript(finalTranscript);
+        } else {
+          addMessage("No speech detected. Please try again.", 'bot');
+        }
+      }
+    }, settings.timeout);
+  };
+
+  recognition.onerror = (event) => {
+    console.error('Speech error:', event.error);
+    if (!(event.error === 'no-speech' && finalTranscript.length > 0)) {
+      addMessage(getSpeechError(event.error), 'bot');
+    }
+    ignoreOnEnd = true;
+    resetSpeechRecognition();
+    clearTimeout(speechTimeout);
+  };
+
+  recognition.onresult = (event) => {
+    clearTimeout(speechTimeout);
+    
+    let interimTranscript = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      if (event.results[i].isFinal) {
+        // Get best alternative
+        let bestAlternative = event.results[i][0];
+        for (let j = 1; j < event.results[i].length; j++) {
+          if (event.results[i][j].confidence > bestAlternative.confidence) {
+            bestAlternative = event.results[i][j];
+          }
+        }
+        finalTranscript += bestAlternative.transcript;
+      } else {
+        interimTranscript += event.results[i][0].transcript;
+      }
+    }
+    
+    // Show interim results in input field
+    if (interimTranscript) {
+      userInput.value = finalTranscript + interimTranscript;
+    }
+    
+    // Reset timeout
+    const langCode = getCurrentLanguageCode();
+    const settings = languageSettings[langCode] || languageSettings['en-US'];
+    speechTimeout = setTimeout(() => {
+      if (isListening) {
+        ignoreOnEnd = true;
+        stopSpeechRecognition();
+        if (finalTranscript.length > 0) {
+          handleFinalTranscript(finalTranscript);
+        }
+      }
+    }, settings.timeout);
+  };
+
+  recognition.onend = () => {
+    if (ignoreOnEnd) {
+      ignoreOnEnd = false;
+      return;
+    }
+    
+    if (finalTranscript.length > 0) {
+      handleFinalTranscript(finalTranscript);
+    } else if (isListening) {
+      setTimeout(() => {
+        if (isListening) recognition.start();
+      }, 500);
+    }
+  };
+}
+
+  
+  recognition = new SpeechRecognition();
+  
+  // Improved configuration
+  recognition.continuous = false;
+  recognition.interimResults = true; // Get interim results
+  recognition.maxAlternatives = 3; // Get multiple recognition alternatives
+  recognition.lang = conversationState.userLanguage || 'en-US';
+  
+  // Timeout settings
+  recognition.onstart = () => {
+    isListening = true;
+    startSpeechBtn.disabled = true;
+    stopSpeechBtn.disabled = false;
+    listeningIndicator.style.display = 'flex';
+    
+    // Reset timeout when speech starts
+    clearTimeout(speechTimeout);
+    speechTimeout = setTimeout(() => {
+      if (isListening) {
+        stopSpeechRecognition();
+        addMessage("Speech recognition timed out. Please try again.", 'bot');
+      }
+    }, 15000); // 15 second timeout
+  };
+  
+  recognition.onerror = (event) => {
+    console.error('Speech error:', event.error);
+    addMessage(getSpeechError(event.error), 'bot');
+    resetSpeechRecognition();
+    clearTimeout(speechTimeout);
+  };
+  
+  recognition.onresult = (event) => {
+    clearTimeout(speechTimeout);
+    
+    // Get the most confident result
+    let transcript = '';
+    if (event.results.length > 0) {
+      const results = event.results[event.results.length - 1];
+      if (results.isFinal) {
+        transcript = results[0].transcript;
+        
+        // If we have alternatives, pick the one with highest confidence
+        if (results.length > 1) {
+          let bestConfidence = 0;
+          for (let i = 0; i < results.length; i++) {
+            if (results[i].confidence > bestConfidence) {
+              bestConfidence = results[i].confidence;
+              transcript = results[i].transcript;
+            }
+          }
+        }
+        
+        if (transcript) {
+          userInput.value = transcript;
+          if (conversationState.currentSpeaker === 'doctor') {
+            processDoctorInput(transcript);
+          } else {
+            processUserInput(transcript);
+          }
+        }
+      }
+    }
+    resetSpeechRecognition();
+  };
+  
+  recognition.onend = () => {
+    if (isListening) {
+      // Restart recognition if still listening
+      setTimeout(() => {
+        if (isListening) recognition.start();
+      }, 500);
+    }
+  };
+
+
     
     // Set up all event listeners
     function setupEventListeners() {
@@ -1190,15 +1486,13 @@
   'hi-IN': 'मरीज, अपना संदेश हिंदी में लिखें...',
   'ar-SA': 'المريض، اكتب رسالتك بالعربية...',
   'vi-VN': 'Bệnh nhân, vui lòng nhập tin nhắn bằng tiếng Việt...',
-  'en-US': 'Patient, type your message in English...' // Default fallback
+  'en-US': 'Patient, type your message in English...'
 };
-
 
 function updateInputPlaceholder() {
   if (conversationState.currentSpeaker === 'doctor') {
     userInput.placeholder = "Doctor, type your message in English...";
   } else {
-    // Get the placeholder in patient's selected language
     const langCode = conversationState.userLanguage || 'en-US';
     userInput.placeholder = languagePlaceholders[langCode] || languagePlaceholders['en-US'];
   }
@@ -1218,46 +1512,77 @@ function updateInputPlaceholder() {
 }
     
     // Process doctor's input (in English)
-    async function processDoctorInput(doctorText) {
-      if (!doctorText.trim()) return;
-      
-      if (!conversationState.userLanguage) {
-        addMessage("Please select your language first", 'bot');
-        return;
-      }
+   
+// Modified processDoctorInput to be async
+async function processDoctorInput(doctorText) {
+  if (!doctorText.trim()) return;
+  
+  if (!conversationState.userLanguage) {
+    addMessage("Please select your language first", 'bot');
+    return;
+  }
+
+  addMessage(doctorText, 'bot');
+
+  try {
+    const targetLang = languageSelector.options[languageSelector.selectedIndex].text;
+    const translatingMsg = addTypingIndicator(`Translating to ${targetLang}...`);
     
-      // Add original doctor message to chat (in English)
-      addMessage(doctorText, 'bot');
+    const translatedText = await translateFromEnglish(doctorText, conversationState.userLanguage);
+    removeTypingIndicator(translatingMsg);
     
-      try {
-        const targetLang = languageSelector.options[languageSelector.selectedIndex].text;
-        const translatingMsg = addTypingIndicator(`Translating to ${targetLang}...`);
-        
-        // Translate to patient's language
-        const translatedText = await translateFromEnglish(doctorText, conversationState.userLanguage);
-        removeTypingIndicator(translatingMsg);
-        
-        // Show translated message to patient
-        addMessage(translatedText, 'bot', true);
-        
-        // Add to conversation history
-        conversationState.conversationHistory.push({
-          speaker: 'doctor',
-          original: doctorText,
-          translation: translatedText,
-          timestamp: new Date()
-        });
-        
-        // Now ready for patient's response
-        conversationState.waitingForDoctor = false;
-      } catch (error) {
-        addMessage(error.message, 'bot');
-      }
-    }
+    addMessage(translatedText, 'bot', true);
+    
+    conversationState.conversationHistory.push({
+      speaker: 'doctor',
+      original: doctorText,
+      translation: translatedText,
+      timestamp: new Date()
+    });
+    
+    // Switch to patient mode after doctor's message is processed
+    conversationState.currentSpeaker = 'patient';
+    updateInputPlaceholder();
+    
+  } catch (error) {
+    addMessage(error.message, 'bot');
+  }
+}
+
+    async function processPatientSpeech(patientText) {
+  if (!conversationState.userLanguage) return;
+  
+  try {
+    const translatingMsg = addTypingIndicator("Translating to English...");
+    
+    // First get the language name for display
+    const langOption = languageSelector.options[languageSelector.selectedIndex];
+    const languageName = langOption.text;
+    
+    // Translate to English
+    const translatedText = await translateToEnglish(patientText, languageName);
+    
+    removeTypingIndicator(translatingMsg);
+    
+    // Show translated message
+    addMessage(translatedText, 'bot', true);
+    
+    // Add to conversation history
+    conversationState.conversationHistory.push({
+      speaker: 'patient',
+      original: patientText,
+      english: translatedText,
+      timestamp: new Date()
+    });
+    
+  } catch (error) {
+    console.error('Translation error:', error);
+    addMessage("Translation failed. Please try again.", 'bot');
+  }
+}
     
     // Process user input (patient's response in their language)
-    // Modify your processUserInput function:
-async function processUserInput(userText) {
+    async function processUserInput(userText) {
   if (!userText.trim()) return;
   
   if (!conversationState.userLanguage) {
@@ -1266,47 +1591,29 @@ async function processUserInput(userText) {
   }
 
   // Add message to chat - show who is speaking
-  addMessage(userText, conversationState.currentSpeaker === 'doctor' ? 'bot' : 'user');
+  addMessage(userText, 'user');
   userInput.value = '';
 
   try {
-    if (conversationState.currentSpeaker === 'doctor') {
-      // Doctor is speaking (English -> Patient's language)
-      const targetLang = languageSelector.options[languageSelector.selectedIndex].text;
-      const translatingMsg = addTypingIndicator(`Translating to ${targetLang}...`);
-      
-      const translatedText = await translateFromEnglish(userText, conversationState.userLanguage);
-      removeTypingIndicator(translatingMsg);
-      
-      addMessage(translatedText, 'bot', true);
-      
-      conversationState.conversationHistory.push({
-        speaker: 'doctor',
-        original: userText,
-        translation: translatedText,
-        timestamp: new Date()
-      });
-    } else {
-      // Patient is speaking (Their language -> English)
-      const targetLang = languageSelector.options[languageSelector.selectedIndex].text;
-      const translatingMsg = addTypingIndicator("Translating to English...");
-      
-      const translatedText = await translateToEnglish(userText, targetLang);
-      removeTypingIndicator(translatingMsg);
-      
-      addMessage(translatedText, 'bot', true);
-      
-      conversationState.conversationHistory.push({
-        speaker: 'patient',
-        original: userText,
-        english: translatedText,
-        timestamp: new Date()
-      });
-    }
+    // Patient is speaking (Their language -> English)
+    const targetLang = languageSelector.options[languageSelector.selectedIndex].text;
+    const translatingMsg = addTypingIndicator("Translating to English...");
     
-    // Switch speaker for next message
-    conversationState.currentSpeaker = conversationState.currentSpeaker === 'doctor' ? 'patient' : 'doctor';
-    updateInputPlaceholder(); // Update the placeholder after switching
+    const translatedText = await translateToEnglish(userText, targetLang);
+    removeTypingIndicator(translatingMsg);
+    
+    addMessage(translatedText, 'bot', true);
+    
+    conversationState.conversationHistory.push({
+      speaker: 'patient',
+      original: userText,
+      english: translatedText,
+      timestamp: new Date()
+    });
+    
+    // Switch back to doctor mode after patient's message
+    conversationState.currentSpeaker = 'doctor';
+    updateInputPlaceholder();
     
   } catch (error) {
     addMessage(error.message, 'bot');
@@ -1574,27 +1881,48 @@ async function processUserInput(userText) {
       };
     }
     
-    function startSpeechRecognition() {
-      if (!recognition) initSpeechRecognition();
-      if (!isListening && conversationState.userLanguage) {
-        recognition.lang = conversationState.userLanguage;
-        recognition.start();
-      }
-    }
-    
-    function stopSpeechRecognition() {
-      if (recognition) {
-        recognition.stop();
-      }
+    // Speech timeout variable
+let speechTimeout;
+
+// Start speech recognition with improved handling
+function startSpeechRecognition() {
+  if (!recognition) setupSpeechRecognition();
+  
+  if (conversationState.currentSpeaker === 'patient' && !conversationState.userLanguage) {
+    addMessage("Please select your language first before speaking", 'bot');
+    return;
+  }
+  
+  updateRecognitionSettings();
+  
+  if (!isListening) {
+    try {
+      ignoreOnEnd = false;
+      finalTranscript = '';
+      recognition.start();
+    } catch (error) {
+      console.error('Recognition start error:', error);
+      addMessage("Couldn't start speech recognition. Please try again.", 'bot');
       resetSpeechRecognition();
     }
+  }
+}
     
-    function resetSpeechRecognition() {
-      isListening = false;
-      startSpeechBtn.disabled = false;
-      stopSpeechBtn.disabled = true;
-      listeningIndicator.style.display = 'none';
-    }
+function stopSpeechRecognition() {
+  if (recognition) {
+    ignoreOnEnd = true;
+    recognition.stop();
+  }
+  resetSpeechRecognition();
+}
+
+function resetSpeechRecognition() {
+  isListening = false;
+  startSpeechBtn.disabled = false;
+  stopSpeechBtn.disabled = true;
+  listeningIndicator.style.display = 'none';
+  clearTimeout(speechTimeout);
+}
     
     function disableSpeechControls() {
       startSpeechBtn.disabled = true;

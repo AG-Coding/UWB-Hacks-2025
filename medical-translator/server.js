@@ -31,7 +31,7 @@ if (!OPENAI_API_KEY) {
 }
 
 // ChatGPT API Helper
-async function callChatGPT(messages, temperature = 0.9) {
+async function callChatGPT(messages, temperature = 0.7) {
   try {
     const response = await axios.post(
       'https://api.openai.com/v1/chat/completions',
@@ -98,7 +98,7 @@ app.post('/api/translate', async (req, res) => {
       }
     ];
 
-    const translation = await callChatGPT(messages, 0.9);
+    const translation = await callChatGPT(messages, 0.7);
     res.json({ translation, sourceLang: normalizedSource, targetLang: normalizedTarget });
 
   } catch (error) {
