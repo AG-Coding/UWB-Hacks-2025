@@ -1115,10 +1115,10 @@
     
     // App State
     let conversationState = {
-      userLanguage: null,
-      conversationHistory: [],
-      waitingForDoctor: true // Flag to track if we're waiting for doctor's input
-    };
+  userLanguage: null,
+  conversationHistory: [],
+  currentSpeaker: 'doctor' // Start with doctor speaking first
+};
 
     // Initialize speech recognition
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1129,6 +1129,7 @@
     function init() {
       setupEventListeners();
       addMessage("Welcome! Please select your language to begin.", 'bot');
+      updateInputPlaceholder(); 
       document.getElementById('recommend-btn').addEventListener('click', generateRecommendations);
       
       // Set up mobile menu toggle
@@ -1176,19 +1177,45 @@
         processUserInput(text);
       }
     }
+
+    const languagePlaceholders = {
+  'es-ES': 'Paciente, escriba su mensaje en español...',
+  'fr-FR': 'Patient, écrivez votre message en français...',
+  'de-DE': 'Patient, schreiben Sie Ihre Nachricht auf Deutsch...',
+  'it-IT': 'Paziente, scrivi il tuo messaggio in italiano...',
+  'pt-BR': 'Paciente, escreva sua mensagem em português...',
+  'ru-RU': 'Пациент, напишите ваше сообщение на русском...',
+  'zh-CN': '患者，请用中文输入您的消息...',
+  'ja-JP': '患者様、日本語でメッセージを入力してください...',
+  'hi-IN': 'मरीज, अपना संदेश हिंदी में लिखें...',
+  'ar-SA': 'المريض، اكتب رسالتك بالعربية...',
+  'vi-VN': 'Bệnh nhân, vui lòng nhập tin nhắn bằng tiếng Việt...',
+  'en-US': 'Patient, type your message in English...' // Default fallback
+};
+
+
+function updateInputPlaceholder() {
+  if (conversationState.currentSpeaker === 'doctor') {
+    userInput.placeholder = "Doctor, type your message in English...";
+  } else {
+    // Get the placeholder in patient's selected language
+    const langCode = conversationState.userLanguage || 'en-US';
+    userInput.placeholder = languagePlaceholders[langCode] || languagePlaceholders['en-US'];
+  }
+}
     
     // Handle language selection change
     function handleLanguageChange() {
-      const selectedLang = languageSelector.options[languageSelector.selectedIndex].text;
-      conversationState.userLanguage = languageSelector.value;
-      
-      if (recognition) {
-        recognition.lang = languageSelector.value;
-      }
-      
-      addMessage(`Language set to ${selectedLang}`, 'bot');
-      conversationState.waitingForDoctor = true; // Now waiting for doctor's first message
-    }
+  const selectedLang = languageSelector.options[languageSelector.selectedIndex].text;
+  conversationState.userLanguage = languageSelector.value;
+  
+  if (recognition) {
+    recognition.lang = conversationState.userLanguage;
+  }
+  
+  addMessage(`Language set to ${selectedLang}`, 'bot');
+  updateInputPlaceholder(); // Add this line
+}
     
     // Process doctor's input (in English)
     async function processDoctorInput(doctorText) {
@@ -1229,49 +1256,62 @@
     }
     
     // Process user input (patient's response in their language)
-    async function processUserInput(userText) {
-      if (!userText.trim()) return;
+    // Modify your processUserInput function:
+async function processUserInput(userText) {
+  if (!userText.trim()) return;
+  
+  if (!conversationState.userLanguage) {
+    addMessage("Please select your language first", 'bot');
+    return;
+  }
+
+  // Add message to chat - show who is speaking
+  addMessage(userText, conversationState.currentSpeaker === 'doctor' ? 'bot' : 'user');
+  userInput.value = '';
+
+  try {
+    if (conversationState.currentSpeaker === 'doctor') {
+      // Doctor is speaking (English -> Patient's language)
+      const targetLang = languageSelector.options[languageSelector.selectedIndex].text;
+      const translatingMsg = addTypingIndicator(`Translating to ${targetLang}...`);
       
-      if (conversationState.waitingForDoctor) {
-        addMessage("Please wait for the doctor's message first", 'bot');
-        return;
-      }
+      const translatedText = await translateFromEnglish(userText, conversationState.userLanguage);
+      removeTypingIndicator(translatingMsg);
       
-      if (!conversationState.userLanguage) {
-        addMessage("Please select your language first", 'bot');
-        return;
-      }
-    
-      // Add user message to chat (in their language)
-      addMessage(userText, 'user');
-      userInput.value = '';
-    
-      try {
-        const targetLang = languageSelector.options[languageSelector.selectedIndex].text;
-        const translatingMsg = addTypingIndicator("Translating to English...");
-        
-        // Translate to English for the doctor
-        const translatedText = await translateToEnglish(userText, targetLang);
-        removeTypingIndicator(translatingMsg);
-        
-        // Show translated message (for doctor)
-        addMessage(translatedText, 'bot', true);
-        
-        // Add to conversation history
-        conversationState.conversationHistory.push({
-          speaker: 'patient',
-          original: userText,
-          english: translatedText,
-          timestamp: new Date()
-        });
-        
-        // Now waiting for doctor's next message
-        conversationState.waitingForDoctor = true;
-      } catch (error) {
-        addMessage(error.message, 'bot');
-      }
+      addMessage(translatedText, 'bot', true);
+      
+      conversationState.conversationHistory.push({
+        speaker: 'doctor',
+        original: userText,
+        translation: translatedText,
+        timestamp: new Date()
+      });
+    } else {
+      // Patient is speaking (Their language -> English)
+      const targetLang = languageSelector.options[languageSelector.selectedIndex].text;
+      const translatingMsg = addTypingIndicator("Translating to English...");
+      
+      const translatedText = await translateToEnglish(userText, targetLang);
+      removeTypingIndicator(translatingMsg);
+      
+      addMessage(translatedText, 'bot', true);
+      
+      conversationState.conversationHistory.push({
+        speaker: 'patient',
+        original: userText,
+        english: translatedText,
+        timestamp: new Date()
+      });
     }
     
+    // Switch speaker for next message
+    conversationState.currentSpeaker = conversationState.currentSpeaker === 'doctor' ? 'patient' : 'doctor';
+    updateInputPlaceholder(); // Update the placeholder after switching
+    
+  } catch (error) {
+    addMessage(error.message, 'bot');
+  }
+}
     // Translate text to English
     async function translateToEnglish(text, targetLang) {
       try {
